@@ -72,4 +72,6 @@ class User extends Authenticatable implements JWTSubject
     public function info(){
         return $this->belongsTo(UserInfo::class, 'user_info_id', 'id')->withTrashed();
     }
+
+    
 }

@@ -122,8 +122,8 @@
         </v-card-title>
         <v-data-table :headers="archivedHeaders" :items="archivedCars" :search="searchArchived" :loading="isLoading" :loading-text="'Retrieving cars data. Please wait ...'">
           <template v-slot:item.image="{ item }">
-            <v-avatar class="ma-0" size="40" tile color="primary">
-              <img class="cursor-pointer" @click.prevent="showProfile(item.image)" v-if="item.image" :src="`http://127.0.0.1:8000/images/cars/${item.image}`" />
+            <v-avatar class="ma-0" size="40" tile color="">
+              <v-img class="cursor-pointer" @click.prevent="showProfile(item.image)" v-if="item.image" :src="`http://127.0.0.1:8000/images/cars/${item.image}`" />
             </v-avatar>
           </template>
           <template v-slot:item.rate="{ item }">

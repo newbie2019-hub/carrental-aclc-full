@@ -6,8 +6,8 @@
     </div>
     <ul>
       <li><router-link to="/home">Home</router-link></li>
-      <li><router-link to="">Rent</router-link></li>
-      <li><router-link to="/">About</router-link></li>
+      <li><a href="#select-car">Rent</a></li>
+      <li><a href="#aboutus">About</a></li>
       <li v-if="!user.id"><router-link to="/login">Login</router-link></li>
       <li v-else><router-link to="/user/dashboard">Account</router-link></li>
     </ul>

@@ -111,7 +111,7 @@
       </v-row>
     </v-container>
 
-    <v-container>
+    <v-container id="select-car">
       <v-row class="mt-15 mb-8" justify="center">
         <v-col>
           <p class="text-center sub-heading">Selected Cars</p>
@@ -134,7 +134,7 @@
       <img src="@/assets/images/car-home.webp" class="bg-car" alt="" />
     </div>
 
-    <v-container>
+    <v-container id="aboutus">
       <v-row class="mt-15 mb-8" justify="center">
         <v-col cols="11" md="6" lg="6">
           <p class="sub-heading">Got Some Questions?</p>
