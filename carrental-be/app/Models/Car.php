@@ -33,6 +33,10 @@ class Car extends Model
     public function branch(){
         return $this->belongsTo(Branch::class, 'branch_id', 'id')->withTrashed();
     }
+
+    public function rate(){
+        return $this->belongsTo(CarRate::class, 'car_rate_id', 'id')->withTrashed();
+    }
     
    
 

@@ -19,6 +19,7 @@ return new class extends Migration
             $table->string('per_week');
             $table->string('per_month');
             $table->string('with_driver');
+            $table->softDeletes();
             $table->timestamps();
         });
     }

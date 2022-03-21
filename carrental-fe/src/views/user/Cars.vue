@@ -59,6 +59,18 @@
           <template v-slot:item.for_rent_status="{ item }">
             <v-chip small dark :color="item.for_rent_status == 'Approved' ? 'green' : 'red'">{{ item.for_rent_status }}</v-chip>
           </template>
+          <template v-slot:item.rate="{ item }">
+            <v-btn
+              text
+              small
+              color="primary"
+              @click.prevent="
+                carRates = item;
+                rateDialog = true;
+              "
+              >View</v-btn
+            >
+          </template>
           <template v-slot:item.actions="{ item }">
             <v-layout>
               <v-btn
@@ -107,6 +119,18 @@
           <v-text-field v-model="searchArchived" outlined dense append-icon="mdi-magnify" class="mb-5" label="Search" single-line hide-details></v-text-field>
         </v-card-title>
         <v-data-table :headers="archivedHeaders" :items="archivedCars" :search="searchArchived" :loading="isLoading" :loading-text="'Retrieving cars data. Please wait ...'">
+          <template v-slot:item.rate="{ item }">
+            <v-btn
+              text
+              small
+              color="primary"
+              @click.prevent="
+                carRates = item;
+                rateDialog = true;
+              "
+              >View</v-btn
+            >
+          </template>
           <template v-slot:item.image="{ item }">
             <v-img :lazy-src="`http://127.0.0.1:8000/images/${item.image}`"></v-img>
           </template>
@@ -190,6 +214,26 @@
       </v-card>
     </v-dialog>
 
+    <v-dialog v-model="rateDialog" max-width="420">
+      <v-card>
+        <v-card-title class="text-h5"> Car Info </v-card-title>
+        <v-card-text class="">
+          <v-layout column>
+            <p class="black--text font-weight-bold mb-0">Brand: {{carRates.brand ? carRates.brand.brand : 'No Data'}}</p>
+            <p class="black--text font-weight-bold">Model: {{carRates.model}}</p>
+            <p class="mb-0 black--text">Per Day: ₱ {{ formatCurrency(carRates.rate.per_day) }}</p>
+            <p class="mb-0 black--text">Per Week: ₱ {{ formatCurrency(carRates.rate.per_week) }}</p>
+            <p class="mb-0 black--text">Per Month: ₱ {{ formatCurrency(carRates.rate.per_month) }}</p>
+            <p class="black--text">With Driver: + ₱ {{ formatCurrency(carRates.rate.with_driver) }}/d</p>
+          </v-layout>
+        </v-card-text>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn color="grey darken-2" text @click="rateDialog = false"> Cancel </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+
     <v-dialog v-model="restoreDialog" max-width="420">
       <v-card>
         <v-card-title class="text-h5"> Restore Car </v-card-title>
@@ -215,12 +259,24 @@
       search: '',
       searchArchived: '',
       valid: true,
+      rateDialog: false,
       archiveDialog: false,
       viewInfoDialog: false,
       deleteDialog: false,
       restoreDialog: false,
       inputDialog: false,
       inputType: null,
+      carRates: {
+        brand: {
+          brand: '',
+        },
+        rate: {
+          per_day: '',
+          per_week: '',
+          per_month: '',
+          with_driver: '',
+        },
+      },
       updateData: {
         model: '',
         description: '',
@@ -246,6 +302,7 @@
         { text: 'Qty', value: 'quantity' },
         { text: 'Plate Number', value: 'plate_number' },
         { text: 'Year', value: 'year' },
+        { text: 'Rate', value: 'rate', align: 'center' },
         { text: 'Transmission', value: 'transmission' },
         { text: 'Status', value: 'for_rent_status' },
         { text: 'Actions', value: 'actions' },
@@ -263,6 +320,7 @@
         { text: 'Plate Number', value: 'plate_number' },
         { text: 'Year', value: 'year' },
         { text: 'Qty', value: 'quantity' },
+        { text: 'Rate', value: 'rate', align: 'center' },
         { text: 'Transmission', value: 'transmission' },
         { text: 'Status', value: 'for_rent_status' },
         { text: 'Deleted At', value: 'deleted_at' },
