@@ -5,9 +5,15 @@ export default {
   state: {
     user: {
       info: {
-        first_name: "Evsu",
+        first_name: "ACLC",
         last_name: "Tacloban",
-      }
+        profile_img: '',
+        valid_id: '',
+        role: {
+          role: ''
+        }
+      },
+
     },
     userinfo: [],
     useraccount: [],
@@ -135,7 +141,7 @@ export default {
         return res;
       }).catch(error => {
         commit('UNSET_USER')
-        if(window.location.pathname != '/'){
+        if (window.location.pathname != '/') {
           window.location = '/'
         }
         return error.response;

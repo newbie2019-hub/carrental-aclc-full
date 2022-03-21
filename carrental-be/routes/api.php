@@ -66,5 +66,6 @@ Route::controller(InquiryController::class)->group(function () {
     Route::delete('inquiry/{id}', 'destroy');
 });
 
+Route::post('upload-car-image', [ImageController::class, 'storeCar']);
 Route::post('upload-image', [ImageController::class, 'store']);
 

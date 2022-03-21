@@ -21,14 +21,17 @@ class CarFactory extends Factory
         $this->faker->addProvider(new \Faker\Provider\Fakecar($this->faker));
         $v = $this->faker->vehicleArray();
         
+        $vehicle = $this->faker->vehicleArray;
         return [
             'car_rate_id' => CarRate::factory(),
-            'car_brand_id' => CarBrand::factory(),
+            'car_brand_id' => CarBrand::factory()->create([
+                'brand' => $vehicle['brand']
+            ]),
             'branch_id' => $this->faker->numberBetween(1, 10),
             'user_id' => $this->faker->numberBetween(1, 10),
-            'quantity' => $this->faker->numberBetween(1, 10),
+            'fuel_type' => $this->faker->vehicleFuelType,
             'plate_number' => $this->faker->vehicleRegistration('[0-3]{1}[0-9]{3}_[0-9]{11}'),
-            'model' => $this->faker->vehicleModel,
+            'model' => $vehicle['model'],
             'vehicle_identification_number' => $this->faker->vin,
             'description' => $this->faker->text(180),
             'remarks' => $this->faker->text(100),

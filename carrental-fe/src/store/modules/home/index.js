@@ -5,12 +5,14 @@ export default {
  state: {
   branch: [],
   cars: [],
+  brands: []
  },
  getters: {
  },
  mutations: {
   SET_DATA(state, payload) {
    state.branch = payload.branch
+   state.brands = payload.brands
    state.cars = payload.cars
   }
  },

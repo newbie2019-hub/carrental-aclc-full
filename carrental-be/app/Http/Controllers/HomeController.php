@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Branch;
 use App\Models\Car;
+use App\Models\CarBrand;
 use Illuminate\Http\Request;
 
 class HomeController extends Controller
@@ -16,10 +17,12 @@ class HomeController extends Controller
     public function index(){
         $branch = Branch::latest()->get(['id', 'branch']);
         $cars = Car::latest()->get();
+        $brands = CarBrand::latest()->get(['id', 'brand']);
         return response()->json([
             'msg' => 'Data retrieved successfully!',
             'branch' => $branch,
-            'cars' => $cars
+            'cars' => $cars,
+            'brands' => $brands,
         ]);
     }
 }

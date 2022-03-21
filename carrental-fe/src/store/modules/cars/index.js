@@ -20,16 +20,21 @@ export default {
   UPDATE_CAR(state, payload) {
    state.cars.map((car, i) => {
     if(car.id == payload.id) {
-     state.car[i].model = payload.model
-     state.car[i].plate_number = payload.plate_number
-     state.car[i].vehicle_identification_number = payload.vehicle_identification_number,
-     state.car[i].description = payload.description,
-     state.car[i].remarks = payload.remarks,
-     state.car[i].mileage = payload.mileage,
-     state.car[i].model = payload.model,
-     state.car[i].year = payload.year,
-     state.car[i].transmission = payload.transmission
-     state.car[i].quantity = payload.quantity
+     state.cars[i].branch = payload.branch
+     state.cars[i].branch_id = payload.branch_id
+     state.cars[i].brand = payload.brand
+     state.cars[i].brand_id = payload.brand_id
+     state.cars[i].car_rate_id = payload.car_rate_id
+     state.cars[i].rate = payload.rate
+     state.cars[i].description = payload.description
+     state.cars[i].remarks = payload.remarks
+     state.cars[i].for_rent_status = payload.for_rent_status
+     state.cars[i].fuel_type = payload.fuel_type
+     state.cars[i].image = payload.image
+     state.cars[i].model = payload.model
+     state.cars[i].seats = payload.seats
+     state.cars[i].year = payload.year
+
     }
    })
   },
@@ -78,7 +83,7 @@ export default {
   },
   async updateCar({ commit }, payload) {
    const res = await API.put(`cars/${payload.id}`, payload).then(res => {
-    commit('UPDATE_CAR', payload)
+    commit('UPDATE_CAR', res.data.data)
     return res;
    }).catch(err => {
     return err.response;
