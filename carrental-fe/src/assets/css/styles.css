@@ -1,0 +1,169 @@
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap');
+
+* {
+ font-family: 'Space Grotesk', sans-serif !important;
+}
+
+/** Utilities */
+input[type="file"] {
+ display: none !important;
+}
+
+.cursor-pointer {
+ cursor: pointer;
+}
+
+.w-75 {
+ width: 60%;
+ line-height: .9;
+}
+
+.h-100 {
+ height: 100% !important;
+}
+
+div.text-h5.font-grotesk {
+ font-family: 'Space Grotesk', sans-serif !important;
+}
+
+.vh-100 {
+ height: 100vh !important;
+}
+
+.position-relative {
+ position: relative;
+}
+
+.custom-primary-color {
+ color: #224773 !important;
+}
+
+.custom-bg-primary {
+ background-color: #224773 !important;
+}
+
+.heading {
+ font-size: 5rem;
+ line-height: 1.2;
+ font-weight: 600;
+ color: #224773;
+}
+
+.sub-heading {
+ font-size: 2rem;
+ line-height: 1.2;
+ font-weight: 600;
+ color: #224773;
+}
+
+/** Home */
+
+.bg-car {
+ position: absolute;
+ top: -8rem;
+ right: 3rem;
+ height: 500px;
+}
+
+.home-car {
+ position: absolute;
+ right: 0;
+ z-index: 0;
+ pointer-events: none;
+}
+
+.z-index-1 {
+ z-index: 1 !important;
+}
+
+.footer {
+ position: relative;
+ bottom: 0;
+ left: 0;
+ width: 100%;
+ background-color: #224773;
+ text-align: center;
+ padding: .5rem;
+}
+
+.content-container {
+ margin-left: 285px;
+ margin-top: 75px;
+}
+
+.fit-content {
+ width: fit-content !important;
+ margin-top: 6px;
+ margin-left: 14px;
+ padding: .7rem .7rem;
+ background: rgba(255, 255, 255, 0.219);
+ /* box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); */
+ backdrop-filter: blur(5px);
+ -webkit-backdrop-filter: blur(5px);
+ border-radius: 15px;
+}
+
+.v-application .text-h6.font-grotesk {
+ font-family: 'Space Grotesk', sans-serif !important;
+ line-height: .93;
+}
+
+.v-application .text-h5.font-grotesk {
+ font-family: 'Space Grotesk', sans-serif !important;
+ line-height: .93;
+}
+
+.text-h1.font-grotesk {
+ font-family: 'Space Grotesk', sans-serif !important;
+}
+
+/** Media Rules */
+@media only screen and (max-width: 1024px) {
+ .bg-car {
+  position: absolute;
+  top: -5rem;
+  right: .5rem;
+  height: 420px;
+ }
+
+ .heading {
+  font-size: 4rem;
+  line-height: 1.2;
+  font-weight: 600;
+  color: #224773;
+ }
+
+ .home-car img {
+  width: 550px;
+ }
+
+}
+
+@media only screen and (max-width: 728px) {
+ .nav .nav-logo {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin-right: 5rem;
+  color: #224773;
+ }
+
+ .bg-car {
+  position: absolute;
+  top: -2rem;
+  right: -8rem;
+  height: 350px;
+ }
+
+ .heading {
+  font-size: 3.5rem;
+  line-height: 1.2;
+  font-weight: 600;
+  color: #224773;
+ }
+
+ .home-car img {
+  width: 480px;
+  margin-right: -7rem;
+ }
+
+}
