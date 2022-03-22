@@ -289,7 +289,7 @@
                 <v-textarea auto-grow rows="1" outlined hide-details="auto" dense class="mt-2" v-model="updateData.remarks" :rules="required" label="Remarks" required></v-textarea>
               </v-col>
             </v-row>
-            <v-divider class="mt-4 mb-4"/>
+            <v-divider class="mt-4 mb-4" />
             <p class="mb-1 font-weight-bold">Rental Rates</p>
             <v-row dense>
               <v-col cols="12" sm="6" md="6" lg="3">
@@ -309,7 +309,9 @@
           <v-card-actions>
             <v-spacer></v-spacer>
             <v-btn color="grey darken-2" text @click="inputDialog = false"> Cancel </v-btn>
-            <v-btn v-if="(user.info.role.role == 'Admin' || user.info.role.role == 'Branch Admin') && updateData.for_rent_status == 'Pending'" color="primary" text @click="inputDialog = false"> Approve </v-btn>
+            <v-btn v-if="(user.info.role.role == 'Admin' || user.info.role.role == 'Branch Admin') && updateData.for_rent_status == 'Pending'" color="primary" text @click="inputDialog = false">
+              Approve
+            </v-btn>
             <v-btn color="green darken-1" text type="submit" :loading="isLoading"> {{ inputType == 'update' ? 'Update' : 'Create' }} </v-btn>
           </v-card-actions>
         </v-card>
@@ -441,6 +443,12 @@
           sortable: false,
           value: 'brand.brand',
         },
+        {
+          text: 'Branch',
+          align: 'start',
+          sortable: true,
+          value: 'branch.branch',
+        },
         { text: 'Model', value: 'model' },
         { text: 'Seats', value: 'seats' },
         // { text: 'Qty', value: 'quantity' },
@@ -458,6 +466,12 @@
           align: 'start',
           sortable: false,
           value: 'brand.brand',
+        },
+        {
+          text: 'Branch',
+          align: 'start',
+          sortable: true,
+          value: 'branch.branch',
         },
         { text: 'Model', value: 'model' },
         { text: 'Seats', value: 'seats' },

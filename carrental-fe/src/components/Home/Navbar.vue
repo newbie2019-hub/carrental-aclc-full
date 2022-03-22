@@ -1,8 +1,8 @@
 <template>
   <div class="nav" :class="{ 'navbar-fixed': isFixed }">
     <div class="nav-logo">
-      <v-icon color="blue darken-3"> mdi-car-brake-retarder </v-icon>
-      Renta Car
+      <v-icon color="primary darken-3"> mdi-car-brake-retarder </v-icon>
+     <span class="nav-logo--text"> Renta Car</span>
     </div>
     <ul>
       <li><router-link to="/home">Home</router-link></li>

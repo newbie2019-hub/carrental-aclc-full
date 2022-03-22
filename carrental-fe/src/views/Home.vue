@@ -138,7 +138,7 @@
       <v-row class="mt-15 mb-8" justify="center">
         <v-col cols="11" md="6" lg="6">
           <p class="sub-heading">Got Some Questions?</p>
-          <p class="">Send us a message and our team will get in touch with you as soon as we receive your query.</p>
+          <p class="">If you got any questions, please do not hesitate to send us a message. We will reply within 24 hours!</p>
           <p class="">or you can send us an email at <a class="text-decoration-none" href="mailto:rentacar@gmail.com">rentacar@gmail.com</a></p>
         </v-col>
         <v-col cols="11" md="6" lg="6">

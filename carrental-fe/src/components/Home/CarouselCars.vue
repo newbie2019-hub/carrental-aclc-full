@@ -69,7 +69,8 @@
               Owned by <span class="font-weight-bold">{{ carData.user.info.last_name }}, {{ carData.user.info.first_name }}</span>
             </p>
             <p>
-              Fuel Type: <span class="font-weight-bold text-capitalize">{{ carData.fuel_type }}</span>&nbsp; Year: <span class="font-weight-bold text-capitalize">{{carData.year}}</span>
+              Fuel Type: <span class="font-weight-bold text-capitalize">{{ carData.fuel_type }}</span
+              >&nbsp; Year: <span class="font-weight-bold text-capitalize">{{ carData.year }}</span>
             </p>
             <v-img
               v-if="carData.image"
@@ -106,7 +107,10 @@
             </p>
           </v-col>
           <v-col>
-            <p><span class="font-weight-bold">Mileage:</span> {{ carData.mileage }}</p>
+            <p>
+              <span class="font-weight-bold">Mileage:</span><br />
+              {{ carData.mileage }}
+            </p>
           </v-col>
           <v-col>
             <p><span class="font-weight-bold">Total Seats:</span> <br />{{ carData.seats }}</p>
@@ -115,24 +119,29 @@
         <v-card-actions>
           <v-spacer></v-spacer>
           <v-btn color="grey darken-1" text @click="dialog = false"> Close </v-btn>
-          <v-btn color="green darken-1" text @click="dialog = false"> Rent </v-btn>
+          <v-btn color="green darken-1" text @click="showRentCar(carData)"> Rent </v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
+    <rental-form v-show="isFormVisible" @close="closeModal" :showForm="isFormVisible" :car="carSelected" />
   </div>
 </template>
 <script>
+  import RentalForm from '../../components/Home/RentalForm.vue';
   import { Carousel, Slide } from 'vue-carousel';
   import { mapState } from 'vuex';
   export default {
     components: {
       Carousel,
       Slide,
+      RentalForm,
     },
     data: () => ({
       branch_id: null,
       location_id: null,
       dialog: false,
+      isFormVisible: false,
+      carSelected: null,
       carData: {
         model: '',
         brand: {
@@ -160,7 +169,25 @@
       await this.$store.dispatch('home/getData');
       this.branch.push({ branch: 'Show All', id: 0 });
     },
-    methods: {},
+    methods: {
+      showModal() {
+        this.isFormVisible = true;
+      },
+      closeModal() {
+        this.isFormVisible = false;
+      },
+      showRentCar(data) {
+        this.carSelected = data;
+        this.isFormVisible = true;
+        this.dialog = false;
+        window.history.replaceState(null, null, "#rental-form");
+        this.toastData(200, {msg: 'Complete your rental information below'})
+        // console.log(document.getElementById('select-car').scrollTop)
+        // window.scrollBy()
+        // document.getElementById('rental-form').scrollIntoView()
+      },
+
+    },
     computed: {
       ...mapState('home', ['cars', 'branch']),
       filterCars() {

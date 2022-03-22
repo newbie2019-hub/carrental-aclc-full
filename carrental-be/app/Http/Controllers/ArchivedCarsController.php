@@ -13,7 +13,7 @@ class ArchivedCarsController extends Controller
     }
 
     public function index(){
-        $cars = Car::onlyTrashed()->with(['user', 'user.info'])->get();
+        $cars = Car::onlyTrashed()->with(['user', 'user.info', 'branch', 'brand'])->get();
         return $this->success('Cars has been retrieved successfully!', $cars);
     }
 

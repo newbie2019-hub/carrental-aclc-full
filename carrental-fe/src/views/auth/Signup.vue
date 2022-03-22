@@ -178,11 +178,6 @@
                 </v-stepper-content>
               </v-stepper-items>
             </v-stepper>
-
-            <!-- <v-layout justify-space-between class="mt-5 pl-3 pr-3">
-              <p class="text-center mt-5">Already have an account? <router-link class="text-decoration-none" to="/login">Login</router-link></p>
-              <v-btn color="blue darken-2" dark depressed class="mt-4 mb-4">Continue</v-btn>
-            </v-layout> -->
           </v-form>
         </v-card>
       </v-col>

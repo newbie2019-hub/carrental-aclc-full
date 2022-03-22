@@ -64,6 +64,7 @@ div.text-h5.font-grotesk {
  color: #224773;
 }
 
+
 /** Home */
 
 .bg-car {
@@ -145,6 +146,16 @@ div.text-h5.font-grotesk {
   width: 550px;
  }
 
+}
+
+@media only screen and (max-width: 2px) {
+
+ .nav .nav-logo {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin-right: 2rem;
+  color: #224773;
+ }
 }
 
 @media only screen and (max-width: 728px) {
