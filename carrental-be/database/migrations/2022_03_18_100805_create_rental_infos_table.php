@@ -17,12 +17,16 @@ return new class extends Migration
             $table->id();
             $table->dateTime('pickup_date');
             $table->dateTime('return_date');
-            $table->text('additional_instruction');
+            $table->text('additional_instruction')->nullable();
             $table->string('payment_status');
             $table->string('with_driver');
-            $table->foreignId('driver_id')->nullable()->constrained('users')->onDelete('cascade');
+            $table->foreignId('driver_id')->nullable()->constrained()->onDelete('cascade');
+            $table->foreignId('car_id')->nullable()->constrained()->onDelete('cascade');
             $table->string('payment_type');
             $table->string('total_payment');
+            $table->integer('days_with_driver')->nullable();
+            $table->string('driver_payment')->nullable();
+            $table->text('drivers_license')->nullable();
             $table->softDeletes();
             $table->timestamps();
         });

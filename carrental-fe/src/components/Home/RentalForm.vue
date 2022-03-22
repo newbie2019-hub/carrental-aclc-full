@@ -9,7 +9,7 @@
       <v-btn @click.stop="dialogCarPolicy = true" color="red" dark>Rental Policy</v-btn>
     </v-layout>
     <v-row v-if="car != null" justify="center" align="start">
-      <v-col cols="12" sm="11" md="5" lg="4">
+      <v-col cols="12" sm="11" md="6" lg="4">
         <v-card class="pt-2 pl-4 pr-4 pb-2" max-width="400">
           <v-layout align-center justify-center>
             <v-card-text>
@@ -68,7 +68,7 @@
           </v-layout>
         </v-card>
       </v-col>
-      <v-col cols="12" sm="11" md="7" lg="6">
+      <v-col cols="12" sm="11" md="6" lg="6">
         <v-card class="pt-6 pl-6 pr-6 pb-6">
           <p class="text-h5 mb-0 font-weight-bold custom-primary-color">Rental Form</p>
           <p class="">Please fill-in all the fields to your choice.</p>
@@ -137,16 +137,19 @@
               required
             ></v-text-field>
           </v-row>
+          <v-layout class="mt-3" justify-end>
+            <v-btn @click="rentalCarDialog = true" depressed color="grey" dark>Rental Info</v-btn>
+          </v-layout>
           <v-layout align-end justify-end class="mt-4">
             <p class="mb-2 font-grotesk font-weight-bold">Payment Method</p>
           </v-layout>
           <v-layout align-end class="">
             <v-spacer />
-            <v-btn class="mr-1" color="green" dark depressed>
+            <v-btn @click.prevent="createRent('On Branch')" class="mr-1" color="green" dark depressed>
               On Branch
               <v-icon small class="ml-1">mdi-receipt</v-icon>
             </v-btn>
-            <v-btn class="" color="primary" depressed>
+            <v-btn @click.prevent="createRent('Credit Card')" class="" color="primary" depressed>
               Credit Card
               <v-icon small class="ml-1">mdi-credit-card-outline</v-icon>
             </v-btn>
@@ -158,14 +161,14 @@
       <v-card class="pt-6 pl-6 pr-5 pb-4">
         <h3 class="fw-bold">Car Use Policy</h3>
         <p class="mt-4 mb-0">The vehicle should be used only within Region VIII and shall not be used for any illegal purposes.</p>
-        <p class="mt-3">The vehicle will have a full tank and should be returned in full tank as well.</p>
-        <h3 class="mt-5 fw-bold">Self-drive Requirements</h3>
-        <p class="mt-4 mb-0">1. Driver's License</p>
-        <p class="mb-0">2. Valid Government Issued ID (Philippine Resident), Passport (Foreign Resident), National ID.</p>
+        <p class="mt-2">The vehicle will have a full tank and should be returned in full tank as well.</p>
+        <p class="mb-2">Valid Government Issued ID (Philippine Resident), Passport (Foreign Resident), National ID.</p>
         <p class="mb-0">
-          3. <span class="font-weight-bold">PHP 5,000</span> Security Deposit. You will provide this when you get the car. This will be given back to you in full upon returning the car and there are
-          no damages.
+          <span class="font-weight-bold">PHP 5,000</span> Security Deposit. You will provide this when you get the car. This will be given back to you in full upon returning the car and there are no
+          damages.
         </p>
+        <h3 class="mt-5 fw-bold">Additional for Self-Drive</h3>
+        <p class="mt-4 mb-0">Driver's License</p>
         <v-card-actions class="mt-2">
           <v-spacer></v-spacer>
           <v-btn @click="dialogCarPolicy = false" color="green" dark depressed>Close</v-btn>
@@ -208,7 +211,7 @@
         pickup_date: '',
         return_date: '',
         additional_instruction: '',
-        with_driver: '',
+        with_driver: false,
         days_with_driver: '',
         name: '',
         cvc: '',
@@ -234,25 +237,50 @@
         date.get;
         const newDate = date.getFullYear().toString() + '-' + '0' + (date.getMonth() + 1).toString() + '-' + (date.getDate() + 1).toString();
         this.maxDate = newDate;
-        // console.log(this.MaxDate);
       },
       setMinDate() {
         const date = new Date();
         date.get;
         const newDate = date.getFullYear().toString() + '-' + '0' + (date.getMonth() + 1).toString() + '-' + date.getDate().toString();
         this.minDate = newDate;
-        // console.log(this.minDate);
       },
       save(date) {
         this.$refs.menu.save(date);
         this.setMaxDate(date);
+      },
+      async createRent(payment) {
+        this.isLoading = true
+        const carDataRent = {
+          pickup_date: this.data.pickup_date,
+          return_date: this.data.return_date,
+          additional_instruction: this.data.additional_instruction,
+          with_driver: this.data.with_driver,
+          days_with_driver: this.data.days_with_driver,
+          driver_payment: this.driversFee,
+          name: this.data.name,
+          cvc: this.data.cvc,
+          number: this.data.number,
+          exp_month: this.data.exp_month,
+          exp_year: this.data.exp_year,
+          payment_type: payment,
+          total: this.total,
+          car_id: this.car.id
+        };
+
+        console.log(carDataRent)
+        const {status, data} = await this.$store.dispatch('rentals/create', carDataRent)
+        this.toastData(status, data)
+        this.total = 0
+        this.driversFee = 0
+        this.isLoading = false
+        this.close()
       },
       dateDifference() {
         var start = moment(this.data.pickup_date, 'YYYY-MM-DD');
         var end = moment(this.data.return_date, 'YYYY-MM-DD');
         //GET DAYS
         const days = moment.duration(end.diff(start)).asDays();
-        console.log(`Start: ${start} | End: ${end} | Days: ${days}`);
+        // console.log(`Start: ${start} | End: ${end} | Days: ${days}`);
         this.totalDays = days;
         if (this.data.pickup_date != '' && this.data.return_date != '') {
           if (days >= 30) {
