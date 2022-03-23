@@ -167,14 +167,16 @@
       CarouselCars,
     },
     async mounted() {
+      this.isLoading = true
       await this.$store.dispatch('auth/checkUser');
       await this.$store.dispatch('home/getData');
+      this.isLoading = false
     },
     data: () => ({
       date: new Date(Date.now() - new Date().getTimezoneOffset() * 60000).toISOString().substr(0, 10),
       menu: false,
       menu2: false,
-      items: ['Foo', 'Bar', 'Fizz', 'Buzz'],
+      initialLoading: true,
       valid: true,
       data: {
         return_date: null,

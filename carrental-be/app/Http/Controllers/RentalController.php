@@ -15,6 +15,11 @@ class RentalController extends Controller
         $this->middleware('auth:api');
     }
 
+    public function index(){
+        $rental = Rental::with(['car','rental_info', 'user'])->latest()->get();
+        return $this->success('Rental data has been retrieved successfully!', $rental);
+    }
+
     public function store(Request $request){
         $response = '';
         if($request->payment_type == 'Credit Card'){

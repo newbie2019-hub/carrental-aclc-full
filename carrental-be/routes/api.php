@@ -3,6 +3,7 @@
 use App\Http\Controllers\ArchivedBranchController;
 use App\Http\Controllers\ArchivedBrandsController;
 use App\Http\Controllers\ArchivedCarsController;
+use App\Http\Controllers\ArchivedDriverController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\InquiryController;
 use App\Http\Controllers\UserController;
@@ -10,6 +11,7 @@ use App\Http\Controllers\ArchivedUsersController;
 use App\Http\Controllers\BranchController;
 use App\Http\Controllers\BrandController;
 use App\Http\Controllers\CarController;
+use App\Http\Controllers\DriverController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\ImageController;
 use App\Http\Controllers\RentalController;
@@ -54,6 +56,9 @@ Route::middleware('api')->group(function () {
     
     Route::apiResource('archived-users', ArchivedUsersController::class);
     Route::apiResource('users', UserController::class);
+    
+    Route::apiResource('archived-drivers', ArchivedDriverController::class);
+    Route::apiResource('drivers', DriverController::class);
     
     Route::apiResource('archived-branch', ArchivedBranchController::class);
     Route::apiResource('branch', BranchController::class);

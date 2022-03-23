@@ -21,6 +21,7 @@ class DatabaseSeeder extends Seeder
             BranchSeeder::class,
             UserAccountSeeder::class,
             CarSeeder::class,
+            DriverSeeder::class,
             InquirySeeder::class,
         ]);
     }
