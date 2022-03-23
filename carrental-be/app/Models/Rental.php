@@ -22,12 +22,16 @@ class Rental extends Model
         return $date->format('Y-m-d h:i A');
     }
 
+    public function car(){
+        return $this->belongsTo(Car::class, 'car_id', 'id')->withTrashed();
+    }
+    
     public function user(){
         return $this->belongsTo(User::class, 'rentee_id', 'id')->withTrashed();
     }
     
     public function rental_info(){
-        return $this->belongsTo(RentalInfo::class, 'renal_info_id', 'id')->withTrashed();
+        return $this->belongsTo(RentalInfo::class, 'rental_info_id', 'id')->withTrashed();
     }
 
 

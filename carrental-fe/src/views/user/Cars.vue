@@ -77,8 +77,8 @@
             <v-layout>
               <v-btn
                 @click="
-                  viewInfoDialog = true;
-                  carData = JSON.parse(JSON.stringify(item));
+                  carInfoDialog = true;
+                  carData = item;
                 "
                 small
                 text
@@ -143,6 +143,16 @@
           </template>
           <template v-slot:item.actions="{ item }">
             <v-layout>
+              <v-btn
+                @click="
+                  carInfoDialog = true;
+                  carData = item;
+                "
+                small
+                text
+                color="primary darken-1"
+                >View</v-btn
+              >
               <v-btn
                 @click="
                   restoreDialog = true;
@@ -367,6 +377,71 @@
         </v-card-actions>
       </v-card>
     </v-dialog>
+
+    <v-dialog v-model="carInfoDialog" max-width="460">
+      <v-card class="pt-2 pl-4 pr-4 pb-2">
+        <v-layout align-center justify-center>
+          <v-card-text>
+            <div></div>
+            <p class="text-h5 mb-0 font-weight-bold custom-primary-color">{{ carData.brand.brand }} {{ carData.model }}</p>
+            <p class="mb-0">
+              Owned by <span class="font-weight-bold">{{ carData.user.info.last_name }}, {{ carData.user.info.first_name }}</span>
+            </p>
+            <p>
+              Fuel Type: <span class="font-weight-bold text-capitalize">{{ carData.fuel_type }}</span
+              >&nbsp; Year: <span class="font-weight-bold text-capitalize">{{ carData.year }}</span>
+            </p>
+            <v-img
+              v-if="carData.image"
+              contain
+              class="mb-7"
+              :lazy-src="`http://127.0.0.1:8000/images/cars/${carData.image}`"
+              max-height="240"
+              max-width="350"
+              :src="`http://127.0.0.1:8000/images/cars/${carData.image}`"
+            ></v-img>
+            <v-img v-else contain class="mb-7" :lazy-src="`https://via.placeholder.com/350x240`" max-height="240" max-width="350" :src="`https://via.placeholder.com/250x140`"></v-img>
+            <div class="d-flex">
+              <p class="mb-0 font-weight-bold mr-5 text-no-wrap text-capitalize"><v-icon color="" class="mr-2">mdi-car-shift-pattern</v-icon>{{ carData.transmission }}</p>
+              <p class="mb-0 font-weight-bold"><v-icon color="" class="mr-1">mdi-map-marker</v-icon>{{ carData.branch.branch }}</p>
+            </div>
+          </v-card-text>
+        </v-layout>
+        <v-layout class="pl-3 pr-4">
+          <v-col>
+            <p><span class="font-weight-bold">Per Day:</span> ₱{{ formatCurrency(carData.rate.per_day) }}</p>
+          </v-col>
+          <v-col>
+            <p><span class="font-weight-bold">Per Week:</span> ₱{{ formatCurrency(carData.rate.per_week) }}</p>
+          </v-col>
+          <v-col>
+            <p><span class="font-weight-bold">Per Month:</span> ₱{{ formatCurrency(carData.rate.per_month) }}</p>
+          </v-col>
+        </v-layout>
+        <v-layout class="pl-3 pr-4 justify-space-between">
+          <v-col>
+            <p>
+              <span class="font-weight-bold">Driver's Fee:</span><br />
+              ₱{{ formatCurrency(carData.rate.with_driver) }}
+            </p>
+          </v-col>
+          <v-col>
+            <p>
+              <span class="font-weight-bold">Mileage:</span><br />
+              {{ carData.mileage }}
+            </p>
+          </v-col>
+          <v-col>
+            <p><span class="font-weight-bold">Total Seats:</span> <br />{{ carData.seats }}</p>
+          </v-col>
+        </v-layout>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn color="grey darken-1" text @click="carInfoDialog = false"> Close </v-btn>
+          <v-btn color="green darken-1" text @click="showRentCar(carData)"> Rent </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
   </div>
 </template>
 <script>
@@ -379,6 +454,29 @@
       search: '',
       searchArchived: '',
       valid: true,
+      carInfoDialog: false,
+      carData: {
+        model: '',
+        brand: {
+          brand: '',
+        },
+        branch: {
+          branch: '',
+          name: '',
+        },
+        rate: {
+          per_day: '',
+          per_week: '',
+          per_month: '',
+        },
+        user: {
+          info: {
+            first_name: '',
+            last_name: '',
+            gender: '',
+          },
+        },
+      },
       rateDialog: false,
       archiveDialog: false,
       viewInfoDialog: false,
@@ -432,7 +530,6 @@
       deleteData: {
         id: null,
       },
-      carData: {},
       restoreData: {},
       isModalVisible: false,
       headers: [

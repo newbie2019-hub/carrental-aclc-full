@@ -21,7 +21,6 @@ return new class extends Migration
             $table->string('payment_status');
             $table->string('with_driver');
             $table->foreignId('driver_id')->nullable()->constrained()->onDelete('cascade');
-            $table->foreignId('car_id')->nullable()->constrained()->onDelete('cascade');
             $table->string('payment_type');
             $table->string('total_payment');
             $table->integer('days_with_driver')->nullable();

@@ -53,9 +53,15 @@
           <v-text-field v-model="search" outlined dense append-icon="mdi-magnify" class="mb-5" label="Search" single-line hide-details></v-text-field>
         </v-card-title>
         <v-data-table :headers="headers" :items="drivers" :search="search" :loading="isLoading" :loading-text="'Retrieving drivers data. Please wait ...'">
-          <template v-slot:item.logo="{ item }">
-            <v-avatar class="ma-0" size="38" color="grey lighten-2">
-              <img v-if="item.profile_img" :src="`http://127.0.0.1:8000/images/${item.profile_img}`" />
+          <template v-slot:item.profile="{ item }">
+            <v-avatar class="ma-0" size="38" color="primary">
+              <img class="cursor-pointer" @click.prevent="showProfile(item.profile_img)" v-if="item.profile_img" :src="`http://127.0.0.1:8000/images/${item.profile_img}`" />
+              <p v-else class="white--text font-weight-bold mb-0">{{ item.first_name[0] }}{{ item.last_name[0] }}</p>
+            </v-avatar>
+          </template>
+          <template v-slot:item.validid="{ item }">
+            <v-avatar class="ma-0" size="38" color="grey lighten-1" tile>
+              <img class="cursor-pointer" @click.prevent="showProfile(item.drivers_license)" :src="`http://127.0.0.1:8000/images/${item.drivers_license}`" />
             </v-avatar>
           </template>
           <template v-slot:item.actions="{ item }">
@@ -96,9 +102,15 @@
           <v-text-field v-model="searchArchived" outlined dense append-icon="mdi-magnify" class="mb-5" label="Search" single-line hide-details></v-text-field>
         </v-card-title>
         <v-data-table :headers="archivedHeaders" :items="archivedDrivers" :search="searchArchived" :loading="isLoading" :loading-text="'Retrieving drivers data. Please wait ...'">
-          <template v-slot:item.logo="{ item }">
-            <v-avatar class="ma-0" size="38" color="grey lighten-2">
-              <img v-if="item.profile_img" :src="`http://127.0.0.1:8000/images/${item.profile_img}`" />
+          <template v-slot:item.profile="{ item }">
+            <v-avatar class="ma-0" size="38" color="primary">
+              <img class="cursor-pointer" @click.prevent="showProfile(item.profile_img)" v-if="item.profile_img" :src="`http://127.0.0.1:8000/images/${item.profile_img}`" />
+              <p v-else class="white--text font-weight-bold mb-0">{{ item.first_name[0] }}{{ item.last_name[0] }}</p>
+            </v-avatar>
+          </template>
+          <template v-slot:item.validid="{ item }">
+            <v-avatar class="ma-0" size="38" color="grey lighten-1" tile>
+              <img class="cursor-pointer" @click.prevent="showProfile(item.drivers_license)" :src="`http://127.0.0.1:8000/images/${item.drivers_license}`" />
             </v-avatar>
           </template>
           <template v-slot:item.actions="{ item }">
@@ -171,8 +183,28 @@
               truncate-length="15"
             >
             </v-file-input>
-            <v-text-field prepend-inner-icon="mdi-card-bulleted" outlined hide-details="auto" dense class="mt-2" v-model="updateData.first_name" :rules="required" label="First Name" required></v-text-field>
-            <v-text-field prepend-inner-icon="mdi-card-bulleted" outlined hide-details="auto" dense class="mt-2" v-model="updateData.middle_name" :rules="required" label="Middle Name" required></v-text-field>
+            <v-text-field
+              prepend-inner-icon="mdi-card-bulleted"
+              outlined
+              hide-details="auto"
+              dense
+              class="mt-2"
+              v-model="updateData.first_name"
+              :rules="required"
+              label="First Name"
+              required
+            ></v-text-field>
+            <v-text-field
+              prepend-inner-icon="mdi-card-bulleted"
+              outlined
+              hide-details="auto"
+              dense
+              class="mt-2"
+              v-model="updateData.middle_name"
+              :rules="required"
+              label="Middle Name"
+              required
+            ></v-text-field>
           </v-layout>
           <v-card-actions>
             <v-spacer></v-spacer>
@@ -246,7 +278,14 @@
           sortable: false,
           value: 'profile',
         },
+        {
+          text: 'Drivers License',
+          align: 'start',
+          sortable: false,
+          value: 'validid',
+        },
         { text: 'First Name', value: 'first_name' },
+        { text: 'Middle Name', value: 'middle_name' },
         { text: 'Last Name', value: 'last_name' },
         { text: 'Email', value: 'email' },
         { text: 'Gender', value: 'gender' },
@@ -256,13 +295,20 @@
         { text: 'Actions', value: 'actions' },
       ],
       archivedHeaders: [
-         {
+        {
           text: 'Profile',
           align: 'start',
           sortable: false,
           value: 'profile',
         },
+        {
+          text: 'Drivers License',
+          align: 'start',
+          sortable: false,
+          value: 'validid',
+        },
         { text: 'First Name', value: 'first_name' },
+        { text: 'Middle Name', value: 'middle_name' },
         { text: 'Last Name', value: 'last_name' },
         { text: 'Email', value: 'email' },
         { text: 'Gender', value: 'gender' },
@@ -281,6 +327,26 @@
       this.isLoading = false;
     },
     methods: {
+      showProfile(url) {
+        this.$viewerApi({
+          images: [`http://127.0.0.1:8000/images/${url}`],
+          options: {
+            'inline': false,
+            'button': true,
+            'navbar': true,
+            'title': true,
+            'toolbar': true,
+            'tooltip': true,
+            'movable': true,
+            'zoomable': true,
+            'rotatable': true,
+            'scalable': true,
+            'transition': true,
+            'fullscreen': true,
+            'keyboard': true,
+          },
+        });
+      },
       async uploadImage(event) {
         if (event) {
           let formData = new FormData();

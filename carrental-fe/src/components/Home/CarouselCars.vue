@@ -177,19 +177,23 @@
         this.isFormVisible = false;
       },
       showRentCar(data) {
-        this.carSelected = data;
-        this.isFormVisible = true;
-        this.dialog = false;
-        window.history.replaceState(null, null, "#rental-form");
-        this.toastData(200, {msg: 'Complete your rental information below'})
-        // console.log(document.getElementById('select-car').scrollTop)
-        // window.scrollBy()
-        // document.getElementById('rental-form').scrollIntoView()
+        if(this.user){
+          this.carSelected = data;
+          this.isFormVisible = true;
+          this.dialog = false;
+          window.history.replaceState(null, null, "#rental-form");
+          this.toastData(200, {msg: 'Complete your rental information below'})
+        }
+        else {
+          this.$router.push('/login')
+          this.toastData(422, {msg: 'Please login or create an account first!'})
+        }
       },
 
     },
     computed: {
       ...mapState('home', ['cars', 'branch']),
+      ...mapState('auth', ['user']),
       filterCars() {
         if (this.branch_id == null) return this.cars;
         if (this.branch_id == 0) return this.cars;

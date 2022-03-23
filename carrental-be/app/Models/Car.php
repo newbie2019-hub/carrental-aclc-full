@@ -27,7 +27,7 @@ class Car extends Model
     }
 
     public function brand(){
-        return $this->belongsTo(CarBrand::class, 'branch_id', 'id')->withTrashed();
+        return $this->belongsTo(CarBrand::class, 'car_brand_id', 'id')->withTrashed();
     }
 
     public function branch(){

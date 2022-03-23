@@ -24,11 +24,12 @@ class DriverFactory extends Factory
             'middle_name' => $this->faker->lastName,
             'last_name' => $this->faker->lastName,
             'address' => $this->faker->address,
+            'email' => $this->faker->unique()->safeEmail(),
             'gender' => $gender,
             'contact_number' => $this->faker->mobileNumber(),
             'birthday' => $this->faker->dateTimeBetween('Y-m-d', '1999-03-20'),
             'profile_img' => $this->faker->image('public\images', 640, 480, null, false, true, $first_name),
-            'valid_id' => $this->faker->image('public\images', 800, 600, null, false, false, 'VALID ID'),
+            'drivers_license' => $this->faker->image('public\images', 800, 600, null, false, false, 'LICENSE'),
         ];
     }
 }

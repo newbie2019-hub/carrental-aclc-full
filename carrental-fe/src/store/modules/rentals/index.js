@@ -3,24 +3,28 @@ import API from '../../base/'
 export default {
  namespaced: true,
  state: {
-  inquiries: []
+  inquiries: [],
+  rentals: [],
+  archivedRentals: [],
  },
  getters: {
-  GET_INQUIRY(state) {
-   return state.inquiries;
-  }
  },
  mutations: {
-  DELETE_INQUIRY(state, payload) {
-   state.inquiries.map((inquiry, i) => {
-    if(inquiry.id == payload.id) {
-     state.inquiries.splice(i, 1)
+  SET_RENTALS(state, payload) {
+   state.rentals = payload
+  },
+  SET_ARCHIVED_RENTALS(state, payload) {
+   state.archivedRentals = payload
+  },
+  REMOVE_RENTAL(state, payload) {
+   state.archivedRentals.unshift(payload)
+
+   state.rentals.map((rental, i) => {
+    if (rental.id == payload.id) {
+     state.rentals.splice(i, 1)
     }
    })
   },
-  SET_INQUIRIES(state, payload) {
-   state.inquiries = payload
-  }
  },
  actions: {
   async create({ commit }, payload) {
@@ -35,6 +39,26 @@ export default {
   async getRentals({ commit }, payload) {
    const res = await API.get('rentals', payload).then(res => {
     commit('SET_RENTALS', res.data.data)
+    return res;
+   }).catch(err => {
+    return err.response;
+   })
+
+   return res;
+  },
+  async getArchivedRentals({ commit }, payload) {
+   const res = await API.get('archived-rentals', payload).then(res => {
+    commit('SET_ARCHIVED_RENTALS', res.data.data)
+    return res;
+   }).catch(err => {
+    return err.response;
+   })
+
+   return res;
+  },
+  async archiveRental({ commit }, payload) {
+   const res = await API.delete(`rentals/${ payload.id }`, payload).then(res => {
+    commit('REMOVE_RENTAL', res.data.data)
     return res;
    }).catch(err => {
     return err.response;

@@ -16,7 +16,7 @@ class RentalController extends Controller
     }
 
     public function index(){
-        $rental = Rental::with(['car','rental_info', 'user'])->latest()->get();
+        $rental = Rental::with(['car:id,car_brand_id,model,plate_number,year,seats,vehicle_identification_number', 'car.brand:id,brand,logo', 'rental_info', 'user.info'])->latest()->get();
         return $this->success('Rental data has been retrieved successfully!', $rental);
     }
 
@@ -37,7 +37,7 @@ class RentalController extends Controller
         
                 $stripecharge = new \Stripe\StripeClient('sk_test_51KAQ3ADoJANsLvgsci2nG46EFVHLQbFxS6qfZ8UEpGl1ffYIVcDBsHOOKu7SVI9MBTCjBm43dSu8oKhQSSsK1uaF00ivv1r0U3');
                 $stripecharge->charges->create([
-                        "amount" => $request->total * 100,
+                        "amount" => ($request->total + 5000) * 100,
                         "currency" => "php",
                         "source" => $token,
                         "description" => "Renta Car payment for rental" 
@@ -57,14 +57,14 @@ class RentalController extends Controller
                 'driver_id' => $request->driver_id,
                 'driver_payment' => $request->driver_payment,
                 'drivers_license' => $request->drivers_license,
-                'total_payment' => $request->total
+                'total_payment' => $request->total + 5000
 
             ];
 
             if($request->with_driver){
                 $data['driver_id'] = $request->driver_id;
                 $data['driver_payment'] = $request->driver_payment;
-                $data['total_payment'] = $request->total_payment;
+                $data['days_with_driver'] = $request->days_with_driver;
             }        
 
             $rentalInfo = RentalInfo::create($data);
@@ -88,8 +88,6 @@ class RentalController extends Controller
                 'additional_instruction' => $request->additional_instruction,
                 'payment_status' => 'Pending',
                 'with_driver' => $request->with_driver,
-                'driver_id' => $request->driver_id,
-                'driver_payment' => $request->driver_payment,
                 'drivers_license' => $request->drivers_license,
                 'total_payment' => $request->total
             ];
@@ -97,7 +95,7 @@ class RentalController extends Controller
             if($request->with_driver){
                 $data['driver_id'] = $request->driver_id;
                 $data['driver_payment'] = $request->driver_payment;
-                $data['total_payment'] = $request->total_payment;
+                $data['days_with_driver'] = $request->days_with_driver;
             }      
             
             $rentalInfo = RentalInfo::create($data);
@@ -109,9 +107,15 @@ class RentalController extends Controller
                 'status' => 'Pending'
             ]);
 
-            $rental->load(['user', 'rental_info']);
+            $rental->load(['user', 'rental_info', 'car']);
 
-            return $this->success('Please pay your rental transaction within 3 days or else it will be cancelled automatically', $rental);
+            return $this->success('Please pay your rental transaction within 2 days or else it will be cancelled automatically', $rental);
         }
+    }
+
+    public function destroy($id){
+        Rental::destroy($id);
+        $rental = Rental::onlyTrashed()->with(['car', 'user', 'user.info', 'rental_info'])->where('id', $id)->first();
+        return $this->success('Rental transaction has been archived', $rental);
     }
 }

@@ -21,9 +21,10 @@ return new class extends Migration
             $table->date('birthday');
             $table->string('gender', 10);
             $table->string('contact_number', 18);
+            $table->string('email');
             $table->text('address');
+            $table->text('drivers_license')->nullable();
             $table->text('profile_img')->nullable();
-            $table->text('valid_id')->nullable();
             $table->softDeletes();
             $table->timestamps();
         });

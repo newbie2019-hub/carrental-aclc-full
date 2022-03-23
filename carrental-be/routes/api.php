@@ -4,6 +4,7 @@ use App\Http\Controllers\ArchivedBranchController;
 use App\Http\Controllers\ArchivedBrandsController;
 use App\Http\Controllers\ArchivedCarsController;
 use App\Http\Controllers\ArchivedDriverController;
+use App\Http\Controllers\ArchivedRentalController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\InquiryController;
 use App\Http\Controllers\UserController;
@@ -63,6 +64,7 @@ Route::middleware('api')->group(function () {
     Route::apiResource('archived-branch', ArchivedBranchController::class);
     Route::apiResource('branch', BranchController::class);
 
+    Route::apiResource('archived-rentals', ArchivedRentalController::class);
     Route::apiResource('rentals', RentalController::class);
 
     Route::get('home', [HomeController::class, 'index']);

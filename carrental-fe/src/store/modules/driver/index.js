@@ -19,6 +19,7 @@ export default {
      state.drivers[i].last_name = payload.last_name
      state.drivers[i].gender = payload.gender
      state.drivers[i].address = payload.address
+     state.drivers[i].contact_number = payload.contact_number
     }
    })
   },
@@ -44,7 +45,7 @@ export default {
     }
    })
   },
-  RESTORE_BRAND(state, payload) {
+  RESTORE_DRIVER(state, payload) {
    state.drivers.unshift(payload)
 
    state.archivedDrivers.map((brand, i) => {

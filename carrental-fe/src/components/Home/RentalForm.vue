@@ -69,92 +69,94 @@
         </v-card>
       </v-col>
       <v-col cols="12" sm="11" md="6" lg="6">
-        <v-card class="pt-6 pl-6 pr-6 pb-6">
-          <p class="text-h5 mb-0 font-weight-bold custom-primary-color">Rental Form</p>
-          <p class="">Please fill-in all the fields to your choice.</p>
-          <v-row dense>
-            <v-col>
-              <v-menu ref="menu" v-model="menu" :close-on-content-click="false" transition="scale-transition" offset-y min-width="auto">
-                <template v-slot:activator="{ on, attrs }">
-                  <v-text-field
-                    v-model="data.pickup_date"
-                    label="Pick Up Date"
-                    append-icon="mdi-calendar"
-                    hide-details="auto"
-                    readonly
-                    v-bind="attrs"
-                    v-on="on"
-                    :loading="isLoading"
-                    :rules="required"
-                    dense
-                    outlined
-                  ></v-text-field>
+        <v-form ref="form" lazy-validation v-model="valid">
+          <v-card class="pt-6 pl-6 pr-6 pb-6">
+            <p class="text-h5 mb-0 font-weight-bold custom-primary-color">Rental Form</p>
+            <p class="">Please fill-in all the fields to your choice.</p>
+            <v-row dense>
+              <v-col>
+                <v-menu ref="menu" v-model="menu" :close-on-content-click="false" transition="scale-transition" offset-y min-width="auto">
+                  <template v-slot:activator="{ on, attrs }">
+                    <v-text-field
+                      v-model="data.pickup_date"
+                      label="Pick Up Date"
+                      append-icon="mdi-calendar"
+                      hide-details="auto"
+                      readonly
+                      v-bind="attrs"
+                      v-on="on"
+                      :loading="isLoading"
+                      :rules="required"
+                      dense
+                      outlined
+                    ></v-text-field>
+                  </template>
+                  <v-date-picker v-model="data.pickup_date" :active-picker.sync="activePicker" :min="minDate" @change="save"></v-date-picker>
+                </v-menu>
+              </v-col>
+              <v-col>
+                <v-menu ref="menu" v-model="menu2" :close-on-content-click="false" transition="scale-transition" offset-y min-width="auto">
+                  <template v-slot:activator="{ on, attrs }">
+                    <v-text-field
+                      v-model="data.return_date"
+                      label="Return Date"
+                      class=""
+                      append-icon="mdi-calendar"
+                      hide-details="auto"
+                      readonly
+                      v-bind="attrs"
+                      v-on="on"
+                      :loading="isLoading"
+                      :rules="required"
+                      dense
+                      outlined
+                    ></v-text-field>
+                  </template>
+                  <v-date-picker v-model="data.return_date" :active-picker.sync="activePicker" :min="maxDate" @change="save"></v-date-picker>
+                </v-menu>
+              </v-col>
+            </v-row>
+            <v-textarea rows="3" outlined hide-details="auto" dense class="mt-2" v-model="data.additional_instruction" label="Additional Instructions" required></v-textarea>
+            <v-row class="">
+              <v-checkbox hide-details="auto" v-model="data.with_driver" class="ml-2">
+                <template v-slot:label>
+                  <div>With Driver</div>
                 </template>
-                <v-date-picker v-model="data.pickup_date" :active-picker.sync="activePicker" :min="minDate" @change="save"></v-date-picker>
-              </v-menu>
-            </v-col>
-            <v-col>
-              <v-menu ref="menu" v-model="menu2" :close-on-content-click="false" transition="scale-transition" offset-y min-width="auto">
-                <template v-slot:activator="{ on, attrs }">
-                  <v-text-field
-                    v-model="data.return_date"
-                    label="Return Date"
-                    class=""
-                    append-icon="mdi-calendar"
-                    hide-details="auto"
-                    readonly
-                    v-bind="attrs"
-                    v-on="on"
-                    :loading="isLoading"
-                    :rules="required"
-                    dense
-                    outlined
-                  ></v-text-field>
-                </template>
-                <v-date-picker v-model="data.return_date" :active-picker.sync="activePicker" :min="maxDate" @change="save"></v-date-picker>
-              </v-menu>
-            </v-col>
-          </v-row>
-          <v-textarea rows="3" outlined hide-details="auto" dense class="mt-2" v-model="data.additional_instruction" :rules="required" label="Additional Instructions" required></v-textarea>
-          <v-row class="">
-            <v-checkbox hide-details="auto" v-model="data.with_driver" class="ml-2">
-              <template v-slot:label>
-                <div>With Driver</div>
-              </template>
-            </v-checkbox>
-          </v-row>
-          <v-row v-if="data.with_driver">
-            <!--- GET TOTAL DAYS AND ADD INPUT BUTTON MAX IS BASED ON THE MAX RENTAL DAYS  --->
-            <v-text-field
-              type="number"
-              outlined
-              hide-details="auto"
-              dense
-              class="mt-3 ml-3 mr-3"
-              v-model="data.days_with_driver"
-              :rules="required"
-              label="No. of Days with Driver"
-              required
-            ></v-text-field>
-          </v-row>
-          <v-layout class="mt-3" justify-end>
-            <v-btn @click="rentalCarDialog = true" depressed color="grey" dark>Rental Info</v-btn>
-          </v-layout>
-          <v-layout align-end justify-end class="mt-4">
-            <p class="mb-2 font-grotesk font-weight-bold">Payment Method</p>
-          </v-layout>
-          <v-layout align-end class="">
-            <v-spacer />
-            <v-btn @click.prevent="createRent('On Branch')" class="mr-1" color="green" dark depressed>
-              On Branch
-              <v-icon small class="ml-1">mdi-receipt</v-icon>
-            </v-btn>
-            <v-btn @click.prevent="createRent('Credit Card')" class="" color="primary" depressed>
-              Credit Card
-              <v-icon small class="ml-1">mdi-credit-card-outline</v-icon>
-            </v-btn>
-          </v-layout>
-        </v-card>
+              </v-checkbox>
+            </v-row>
+            <v-row v-if="data.with_driver">
+              <!--- GET TOTAL DAYS AND ADD INPUT BUTTON MAX IS BASED ON THE MAX RENTAL DAYS  --->
+              <v-text-field
+                type="number"
+                outlined
+                hide-details="auto"
+                dense
+                class="mt-3 ml-3 mr-3"
+                v-model="data.days_with_driver"
+                :rules="[maxDayswithDriver]"
+                label="No. of Days with Driver"
+                required
+              ></v-text-field>
+            </v-row>
+            <v-layout class="mt-3" justify-end>
+              <v-btn class="mt-3" @click="rentalCarDialog = true" depressed color="grey" dark>Rental Info</v-btn>
+            </v-layout>
+            <v-layout align-end justify-end class="mt-4">
+              <p class="mb-2 font-grotesk font-weight-bold">Payment Method</p>
+            </v-layout>
+            <v-layout align-end class="">
+              <v-spacer />
+              <v-btn @click.prevent="createRent('On Branch')" class="mr-1" color="green" dark depressed>
+                On Branch
+                <v-icon small class="ml-1">mdi-receipt</v-icon>
+              </v-btn>
+              <v-btn @click.prevent="createRent('Credit Card')" class="" color="primary" depressed>
+                Credit Card
+                <v-icon small class="ml-1">mdi-credit-card-outline</v-icon>
+              </v-btn>
+            </v-layout>
+          </v-card>
+        </v-form>
       </v-col>
     </v-row>
     <v-dialog v-model="dialogCarPolicy" max-width="460">
@@ -179,9 +181,10 @@
       <v-card class="pt-6 pl-6 pr-5 pb-4">
         <p class="text-h5 font-grotesk font-weight-bold mb-5">Rental Information</p>
         <p class="mb-0"><span class="font-weight-bold">Rental Days:</span> {{ totalDays }}d</p>
+        <p class="mb-0"><span class="font-weight-bold">Rental Fee:</span> ₱ {{ formatCurrency(total - driversFee) }}</p>
         <p class="mb-0"><span class="font-weight-bold">With Driver:</span> {{ data.with_driver ? 'Yes' : 'No' }}</p>
         <p class="mb-0"><span class="font-weight-bold">Drivers Fee:</span> ₱ {{ formatCurrency(driversFee) }}</p>
-        <p><span class="font-weight-bold">Total Payment:</span> ₱ {{ formatCurrency(total) }}</p>
+        <p><span class="font-weight-bold">Total Payment:</span> ₱ {{ formatCurrency(total) }} + ₱ {{ formatCurrency(5000) }} Security Deposit</p>
         <v-card-actions class="mt-2">
           <v-spacer></v-spacer>
           <v-btn @click="rentalCarDialog = false" color="green" dark depressed>Close</v-btn>
@@ -192,6 +195,7 @@
 </template>
 <script>
   import moment from 'moment';
+  import { mapState } from 'vuex';
   export default {
     props: {
       car: Object,
@@ -212,7 +216,7 @@
         return_date: '',
         additional_instruction: '',
         with_driver: false,
-        days_with_driver: '',
+        days_with_driver: 1,
         name: '',
         cvc: '',
         number: '',
@@ -224,6 +228,7 @@
       total: 0,
       totalDays: 0,
       driversFee: 0,
+      valid: true,
     }),
     mounted() {
       this.setMinDate();
@@ -248,32 +253,41 @@
         this.$refs.menu.save(date);
         this.setMaxDate(date);
       },
+      maxDayswithDriver: function () {
+        if (this.data.with_driver && (this.data.days_with_driver <= this.totalDays) && (this.data.pickup_date != '' || this.data.return_date != '')) {
+          return true;
+        } else  {
+          return 'Incomplete or Invalid input';
+        }
+      },
       async createRent(payment) {
-        this.isLoading = true
-        const carDataRent = {
-          pickup_date: this.data.pickup_date,
-          return_date: this.data.return_date,
-          additional_instruction: this.data.additional_instruction,
-          with_driver: this.data.with_driver,
-          days_with_driver: this.data.days_with_driver,
-          driver_payment: this.driversFee,
-          name: this.data.name,
-          cvc: this.data.cvc,
-          number: this.data.number,
-          exp_month: this.data.exp_month,
-          exp_year: this.data.exp_year,
-          payment_type: payment,
-          total: this.total,
-          car_id: this.car.id
-        };
+        const valid = this.$refs.form.validate();
+        if (valid) {
+          this.isLoading = true;
+          const carDataRent = {
+            pickup_date: this.data.pickup_date,
+            return_date: this.data.return_date,
+            additional_instruction: this.data.additional_instruction,
+            with_driver: this.data.with_driver,
+            days_with_driver: this.data.days_with_driver,
+            driver_payment: this.driversFee,
+            name: this.data.name,
+            cvc: this.data.cvc,
+            number: this.data.number,
+            exp_month: this.data.exp_month,
+            exp_year: this.data.exp_year,
+            payment_type: payment,
+            total: this.total,
+            car_id: this.car.id,
+          };
 
-        console.log(carDataRent)
-        const {status, data} = await this.$store.dispatch('rentals/create', carDataRent)
-        this.toastData(status, data)
-        this.total = 0
-        this.driversFee = 0
-        this.isLoading = false
-        this.close()
+          const { status, data } = await this.$store.dispatch('rentals/create', carDataRent);
+          this.toastData(status, data);
+          this.total = 0;
+          this.driversFee = 0;
+          this.isLoading = false;
+          this.close();
+        }
       },
       dateDifference() {
         var start = moment(this.data.pickup_date, 'YYYY-MM-DD');
@@ -292,7 +306,6 @@
               this.total = parseFloat(this.total) + parseFloat(((days % 30) % 7) * this.car.rate.per_day);
               console.log(`Total for the remaining days: ${this.total}`);
             } else {
-              console.log('Hi');
               this.total = parseFloat(this.total) + (days % 30) * this.car.rate.per_day;
             }
           } else if (days >= 7 && days <= 30) {
@@ -310,6 +323,7 @@
       },
     },
     computed: {
+      ...mapState('auth', ['user']),
       rentalForm: {
         get() {
           return this.showForm;
