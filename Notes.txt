@@ -1,0 +1,13 @@
+Enable intl on php.ini
+
+https://stackoverflow.com/questions/30554177/fatal-error-class-numberformatter-not-found
+
+Run php artisan storage:link to create a symbolic link
+
+edit filesystem.php
+'invoice' => [
+            'driver' => 'local',
+            'root' => storage_path('app/public/invoices'),
+            'visibility' => 'public',
+            'throw' => false,
+        ],

@@ -15,9 +15,11 @@ return new class extends Migration
     {
         Schema::create('rentals', function (Blueprint $table) {
             $table->id();
+            $table->text('transaction_number');
             $table->foreignId('car_id')->constrained()->onDelete('cascade');
             $table->foreignId('rentee_id')->constrained('users')->onDelete('cascade');
             $table->foreignId('rental_info_id')->constrained()->onDelete('cascade');
+            $table->text('invoice');
             $table->string('status', 30);
             $table->softDeletes();
             $table->timestamps();

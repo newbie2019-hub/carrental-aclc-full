@@ -44,6 +44,14 @@ return [
             'throw' => false,
         ],
 
+        'invoice' => [
+            'driver' => 'local',
+            'root' => storage_path('app/public/invoices'),
+            'url' => '/storage/invoices',
+            'visibility' => 'public',
+            'throw' => false,
+        ],
+
         's3' => [
             'driver' => 's3',
             'key' => env('AWS_ACCESS_KEY_ID'),

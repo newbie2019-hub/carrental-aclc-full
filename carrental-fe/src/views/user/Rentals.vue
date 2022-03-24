@@ -1,8 +1,8 @@
 <template>
   <div class="pl-lg-6 pl-md-3">
     <div>
-      <p class="text-h5 font-weight-bold mt-4 custom-primary-color mb-0">Drivers Management</p>
-      <p>You can manage all of the drivers below</p>
+      <p class="text-h5 font-weight-bold mt-4 custom-primary-color mb-0">Rentals Management</p>
+      <p>You can manage all of the rentals below</p>
     </div>
     <v-row class="mt-5 mb-5">
       <v-col cols="12" sm="6" md="4" lg="4" xl="4">
@@ -53,13 +53,13 @@
           <v-text-field v-model="search" outlined dense append-icon="mdi-magnify" class="mb-5" label="Search" single-line hide-details></v-text-field>
         </v-card-title>
         <v-data-table :headers="headers" :items="rentals" :search="search" :loading="isLoading" :loading-text="'Retrieving drivers data. Please wait ...'">
-          <template v-slot:item.rentee="{ item }">
+          <template v-slot:item.user.info.last_name="{ item }">
             <p class="text-no-wrap">{{ item.user.info.last_name }}, {{ item.user.info.first_name }} {{ item.user.info.middle_name ? item.user.info.middle_name[0] : '' }}</p>
           </template>
           <template v-slot:item.total_payment="{ item }">
             <p class="text-no-wrap">₱ {{ formatCurrency(item.rental_info.total_payment) }}</p>
           </template>
-          <template v-slot:item.car="{ item }">
+          <template v-slot:item.car.brand.brand="{ item }">
             <p class="text-no-wrap">{{ item.car.brand.brand }} {{ item.car.model }} - {{ item.car.year }}</p>
           </template>
           <template v-slot:item.actions="{ item }">
@@ -100,13 +100,13 @@
           <v-text-field v-model="searchArchived" outlined dense append-icon="mdi-magnify" class="mb-5" label="Search" single-line hide-details></v-text-field>
         </v-card-title>
         <v-data-table :headers="archivedHeaders" :items="archivedRentals" :search="searchArchived" :loading="isLoading" :loading-text="'Retrieving rentals data. Please wait ...'">
-          <template v-slot:item.rentee="{ item }">
+          <template v-slot:item.user.info.last_name="{ item }">
             <p class="text-no-wrap">{{ item.user.info.last_name }}, {{ item.user.info.first_name }} {{ item.user.info.middle_name ? item.user.info.middle_name[0] : '' }}</p>
           </template>
           <template v-slot:item.total_payment="{ item }">
             <p class="text-no-wrap">₱ {{ formatCurrency(item.rental_info.total_payment) }}</p>
           </template>
-          <template v-slot:item.car="{ item }">
+          <template v-slot:item.car.brand.brand="{ item }">
             <p class="text-no-wrap">{{ item.car.brand.brand }} {{ item.car.model }} - {{ item.car.year }}</p>
           </template>
 
@@ -258,10 +258,11 @@
       restoreData: {},
       isModalVisible: false,
       headers: [
-        { text: 'Rentee', value: 'rentee' },
-        { text: 'Car', value: 'car' },
+        { text: 'Rentee', value: 'user.info.last_name' },
+        { text: 'Car', value: 'car.brand.brand' },
         { text: 'Pick Up Date', value: 'rental_info.pickup_date' },
         { text: 'Return Date', value: 'rental_info.pickup_date' },
+        { text: 'Transaction Date', value: 'created_at' },
         { text: 'Additional Instruction', value: 'rental_info.additional_instruction' },
         { text: 'Payment Type', value: 'rental_info.payment_type' },
         { text: 'Payment Status', value: 'rental_info.payment_status' },
@@ -269,10 +270,11 @@
         { text: 'Actions', value: 'actions' },
       ],
       archivedHeaders: [
-        { text: 'Rentee', value: 'rentee' },
-        { text: 'Car', value: 'car' },
+        { text: 'Rentee', value: 'user.info.last_name' },
+        { text: 'Car', value: 'car.brand.brand' },
         { text: 'Pick Up Date', value: 'rental_info.pickup_date' },
         { text: 'Return Date', value: 'rental_info.pickup_date' },
+        { text: 'Transaction Date', value: 'created_at' },
         { text: 'Additional Instruction', value: 'rental_info.additional_instruction' },
         { text: 'Payment Type', value: 'rental_info.payment_status' },
         { text: 'Total Payment', value: 'total_payment' },

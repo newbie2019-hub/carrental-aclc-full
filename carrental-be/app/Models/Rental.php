@@ -6,6 +6,7 @@ use DateTimeInterface;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Str;
 
 class Rental extends Model
 {
@@ -34,5 +35,9 @@ class Rental extends Model
         return $this->belongsTo(RentalInfo::class, 'rental_info_id', 'id')->withTrashed();
     }
 
+    public function setTransactionNumberAttribute($transaction_number){
+        return $this->attributes['transaction_number'] = time() . $this->id;
+    }
+ 
 
 }

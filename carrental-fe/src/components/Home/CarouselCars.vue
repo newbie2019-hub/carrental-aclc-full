@@ -177,7 +177,7 @@
         this.isFormVisible = false;
       },
       showRentCar(data) {
-        if(this.user){
+        if(this.user.info.first_name != ''){
           this.carSelected = data;
           this.isFormVisible = true;
           this.dialog = false;

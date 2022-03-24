@@ -112,7 +112,7 @@
                       outlined
                     ></v-text-field>
                   </template>
-                  <v-date-picker v-model="data.return_date" :active-picker.sync="activePicker" :min="maxDate" @change="save"></v-date-picker>
+                  <v-date-picker v-model="data.return_date" :active-picker.sync="activePicker" :min="minDate" @change="save"></v-date-picker>
                 </v-menu>
               </v-col>
             </v-row>
@@ -146,11 +146,11 @@
             </v-layout>
             <v-layout align-end class="">
               <v-spacer />
-              <v-btn @click.prevent="createRent('On Branch')" class="mr-1" color="green" dark depressed>
+              <v-btn @click.prevent="createRent('On Branch')" class="mr-1" color="green" dark depressed :loading="isLoading">
                 On Branch
                 <v-icon small class="ml-1">mdi-receipt</v-icon>
               </v-btn>
-              <v-btn @click.prevent="createRent('Credit Card')" class="" color="primary" depressed>
+              <v-btn @click.prevent="createRent('Credit Card')" class="" color="primary" depressed :loading="isLoading">
                 Credit Card
                 <v-icon small class="ml-1">mdi-credit-card-outline</v-icon>
               </v-btn>
@@ -224,6 +224,7 @@
         exp_month: '',
         exp_year: '',
         payment_type: '',
+        rentalPayment: 0,
       },
       total: 0,
       totalDays: 0,
@@ -240,7 +241,7 @@
       setMaxDate(data) {
         const date = new Date(data);
         date.get;
-        const newDate = date.getFullYear().toString() + '-' + '0' + (date.getMonth() + 1).toString() + '-' + (date.getDate() + 1).toString();
+        const newDate = date.getFullYear().toString() + '-' + '0' + date.getMonth().toString() + '-' + (date.getDate() + 1).toString();
         this.maxDate = newDate;
       },
       setMinDate() {
@@ -254,9 +255,9 @@
         this.setMaxDate(date);
       },
       maxDayswithDriver: function () {
-        if (this.data.with_driver && (this.data.days_with_driver <= this.totalDays) && (this.data.pickup_date != '' || this.data.return_date != '')) {
+        if (this.data.with_driver && this.data.days_with_driver <= this.totalDays && (this.data.pickup_date != '' || this.data.return_date != '')) {
           return true;
-        } else  {
+        } else {
           return 'Incomplete or Invalid input';
         }
       },
@@ -272,20 +273,27 @@
             days_with_driver: this.data.days_with_driver,
             driver_payment: this.driversFee,
             name: this.data.name,
+            rentalPayment: this.data.rentalPayment,
             cvc: this.data.cvc,
             number: this.data.number,
             exp_month: this.data.exp_month,
             exp_year: this.data.exp_year,
             payment_type: payment,
+            totalDays: this.totalDays,
             total: this.total,
             car_id: this.car.id,
           };
 
           const { status, data } = await this.$store.dispatch('rentals/create', carDataRent);
           this.toastData(status, data);
+          if (status == 200) {
+            window.open(`http://127.0.0.1:8000${data.data.invoice}`)
+          }
           this.total = 0;
           this.driversFee = 0;
           this.isLoading = false;
+          this.$refs.form.reset();
+          this.data.with_driver = false;
           this.close();
         }
       },
@@ -313,6 +321,7 @@
             this.total = parseFloat(this.total) + (days % 7) * this.car.rate.per_day;
           } else {
             this.total = parseFloat(this.car.rate.per_day * days);
+            this.data.rentalPayment = this.total;
           }
         }
 
