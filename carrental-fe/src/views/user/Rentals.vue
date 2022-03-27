@@ -27,7 +27,7 @@
               <div class="fit-content">
                 <v-icon large class=""> mdi-archive-clock-outline </v-icon>
               </div>
-              <v-card-title class="text-h5 font-grotesk font-weight-bold mb-0 pa-0 pl-4 pb-2 pt-4">Archived <br />Rentals</v-card-title>
+              <v-card-title class="text-h5 font-grotesk font-weight-bold mb-0 pa-0 pl-4 pb-2 pt-4">Cancelled <br />Rentals</v-card-title>
             </div>
             <div>
               <p class="text-h1 font-grotesk pr-5 font-weight-bold mb-0">{{ getData(archivedRentals) }}</p>
@@ -53,11 +53,18 @@
           <v-text-field v-model="search" outlined dense append-icon="mdi-magnify" class="mb-5" label="Search" single-line hide-details></v-text-field>
         </v-card-title>
         <v-data-table :headers="headers" :items="rentals" :search="search" :loading="isLoading" :loading-text="'Retrieving drivers data. Please wait ...'">
+          <template v-slot:item.invoice="{ item }">
+            <a v-if="item.rental_info.payment_type == 'On Branch'" class="text-decoration-none" :href="`http://127.0.0.1:8000${item.invoice}`" target="_">View Invoice</a>
+            <a v-else class="text-decoration-none" :href="`${item.invoice}`" target="_">View Invoice</a>
+          </template>
           <template v-slot:item.user.info.last_name="{ item }">
             <p class="text-no-wrap">{{ item.user.info.last_name }}, {{ item.user.info.first_name }} {{ item.user.info.middle_name ? item.user.info.middle_name[0] : '' }}</p>
           </template>
           <template v-slot:item.total_payment="{ item }">
             <p class="text-no-wrap">₱ {{ formatCurrency(item.rental_info.total_payment) }}</p>
+          </template>
+          <template v-slot:item.rental_info.payment_status="{ item }">
+            <v-chip small dark :color="item.rental_info.payment_status == 'Pending' ? 'red' : 'green'">{{item.rental_info.payment_status}}</v-chip>
           </template>
           <template v-slot:item.car.brand.brand="{ item }">
             <p class="text-no-wrap">{{ item.car.brand.brand }} {{ item.car.model }} - {{ item.car.year }}</p>
@@ -65,6 +72,7 @@
           <template v-slot:item.actions="{ item }">
             <v-layout>
               <v-btn
+                v-if="item.rental_info.payment_status != 'Paid'"
                 @click="
                   inputDialog = true;
                   inputType = 'update';
@@ -73,8 +81,7 @@
                 small
                 text
                 color="green darken-1"
-                >Update</v-btn
-              >
+                >Payment</v-btn>
               <v-btn
                 @click="
                   deleteData = item;
@@ -83,7 +90,7 @@
                 small
                 text
                 color="red darken-1"
-                >Archive</v-btn
+                >Cancel</v-btn
               >
             </v-layout>
           </template>
@@ -94,22 +101,28 @@
     <v-row class="mb-5">
       <v-col>
         <v-card-title>
-          Archived Rentals
+          Cancelled Transactions
           <v-spacer></v-spacer>
           <v-spacer></v-spacer>
           <v-text-field v-model="searchArchived" outlined dense append-icon="mdi-magnify" class="mb-5" label="Search" single-line hide-details></v-text-field>
         </v-card-title>
         <v-data-table :headers="archivedHeaders" :items="archivedRentals" :search="searchArchived" :loading="isLoading" :loading-text="'Retrieving rentals data. Please wait ...'">
+          <template v-slot:item.invoice="{ item }">
+            <a class="text-decoration-none" :href="`http://127.0.0.1:8000${item.invoice}`" target="_">View Invoice</a>
+          </template>
           <template v-slot:item.user.info.last_name="{ item }">
             <p class="text-no-wrap">{{ item.user.info.last_name }}, {{ item.user.info.first_name }} {{ item.user.info.middle_name ? item.user.info.middle_name[0] : '' }}</p>
           </template>
           <template v-slot:item.total_payment="{ item }">
             <p class="text-no-wrap">₱ {{ formatCurrency(item.rental_info.total_payment) }}</p>
           </template>
+          <template v-slot:item.rental_info.payment_status="{ item }">
+            <v-chip small dark :color="item.rental_info.payment_status == 'Pending' ? 'red' : 'green'">{{item.rental_info.payment_status}}</v-chip>
+          </template>
           <template v-slot:item.car.brand.brand="{ item }">
             <p class="text-no-wrap">{{ item.car.brand.brand }} {{ item.car.model }} - {{ item.car.year }}</p>
           </template>
-
+          <!-- 
           <template v-slot:item.actions="{ item }">
             <v-layout>
               <v-btn
@@ -120,9 +133,10 @@
                 small
                 text
                 color="grey darken-1"
-                >Restore</v-btn>
+                >Cancel</v-btn
+              >
             </v-layout>
-          </template>
+          </template> -->
         </v-data-table>
       </v-col>
     </v-row>
@@ -130,72 +144,38 @@
     <v-dialog v-model="archiveDialog" max-width="420">
       <v-card>
         <v-card-title class="text-h5"> Confirm Action </v-card-title>
-        <v-card-text class="">
-          Are you sure you want to delete this driver's data?
-          <span class="red--text darken-2">Note: This driver will be marked as archived to preserve any related transactions.</span>
-        </v-card-text>
+        <v-card-text class=""> Are you sure you want to cancel this transaction? </v-card-text>
         <v-card-actions>
           <v-spacer></v-spacer>
           <v-btn color="grey darken-2" text @click="archiveDialog = false"> Cancel </v-btn>
-          <v-btn color="red darken-1" text @click="archiveRental" :loading="isLoading"> Archive </v-btn>
+          <v-btn color="red darken-1" text @click="archiveRental" :loading="isLoading"> Cancel </v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
 
     <v-dialog v-model="inputDialog" max-width="420">
-      <v-form ref="form" v-model="valid" @submit.prevent="saveDriver" lazy-validation class="pa-0 ma-0">
+      <v-form ref="form" v-model="valid" @submit.prevent="createPayment" lazy-validation class="pa-0 ma-0">
         <v-card class="">
-          <v-card-title class="text-h5"> {{ inputType == 'update' ? 'Update' : 'New' }} Driver </v-card-title>
-          <v-card-subtitle>All fields are required</v-card-subtitle>
-          <v-layout justify-center class="mb-5">
-            <v-avatar class="ma-0" size="80" color="grey lighten-2">
-              <img v-if="updateData.profile_img" :src="`http://127.0.0.1:8000/images/${updateData.profile_img}`" />
-            </v-avatar>
-          </v-layout>
-          <v-layout column class="mb-4 pr-4 pl-4">
-            <v-file-input
-              @change="uploadImage"
-              v-model="updateData.image"
-              prepend-icon=""
-              label="New Profile Image"
-              class=""
-              :rules="required"
-              accept="image/*"
-              prepend-inner-icon="mdi-paperclip"
-              outlined
-              dense
-              hide-details="auto"
-              show-size
-              truncate-length="15"
-            >
-            </v-file-input>
+          <v-card-title class="text-h5"> Rental Payment </v-card-title>
+          <v-card-subtitle>Please fill-in the input correctly</v-card-subtitle>
+          <v-layout column class="mb-1 pr-4 pl-4">
             <v-text-field
               prepend-inner-icon="mdi-card-bulleted"
               outlined
               hide-details="auto"
               dense
               class="mt-2"
-              v-model="updateData.first_name"
-              :rules="required"
-              label="First Name"
-              required
-            ></v-text-field>
-            <v-text-field
-              prepend-inner-icon="mdi-card-bulleted"
-              outlined
-              hide-details="auto"
-              dense
-              class="mt-2"
-              v-model="updateData.middle_name"
-              :rules="required"
-              label="Middle Name"
+              v-model="updateData.amount_tendered"
+              :rules="[checkAmount]"
+              label="Amount Tendered"
               required
             ></v-text-field>
           </v-layout>
+          <p class="mb-5 ml-4">Total Amount: ₱ {{formatCurrency(updateData.rental_info.total_payment)}}</p>
           <v-card-actions>
             <v-spacer></v-spacer>
             <v-btn color="grey darken-2" text @click="inputDialog = false"> Cancel </v-btn>
-            <v-btn color="green darken-1" text type="submit" :loading="isLoading"> {{ inputType == 'update' ? 'Update' : 'Save' }} </v-btn>
+            <v-btn color="green darken-1" text type="submit" :loading="isLoading"> Proceed </v-btn>
           </v-card-actions>
         </v-card>
       </v-form>
@@ -251,6 +231,10 @@
         brand: '',
         logo: '',
         image: '',
+        amount_tendered: '',
+        rental_info: {
+          total_payment: 0
+        }
       },
       deleteData: {
         id: null,
@@ -258,6 +242,7 @@
       restoreData: {},
       isModalVisible: false,
       headers: [
+        { text: 'Transaction No.', value: 'transaction_number' },
         { text: 'Rentee', value: 'user.info.last_name' },
         { text: 'Car', value: 'car.brand.brand' },
         { text: 'Pick Up Date', value: 'rental_info.pickup_date' },
@@ -267,9 +252,11 @@
         { text: 'Payment Type', value: 'rental_info.payment_type' },
         { text: 'Payment Status', value: 'rental_info.payment_status' },
         { text: 'Total Payment', value: 'total_payment' },
+        { text: 'Invoice', value: 'invoice' },
         { text: 'Actions', value: 'actions' },
       ],
       archivedHeaders: [
+        { text: 'Transaction No.', value: 'transaction_number' },
         { text: 'Rentee', value: 'user.info.last_name' },
         { text: 'Car', value: 'car.brand.brand' },
         { text: 'Pick Up Date', value: 'rental_info.pickup_date' },
@@ -279,8 +266,9 @@
         { text: 'Payment Type', value: 'rental_info.payment_status' },
         { text: 'Total Payment', value: 'total_payment' },
         { text: 'Payment Status', value: 'rental_info.payment_status' },
-        { text: 'Deleted On', value: 'deleted_at' },
-        { text: 'Actions', value: 'actions' },
+        { text: 'Invoice', value: 'invoice' },
+        { text: 'Cancelled On', value: 'deleted_at' },
+        // { text: 'Actions', value: 'actions' },
       ],
     }),
     async mounted() {
@@ -310,6 +298,13 @@
             'keyboard': true,
           },
         });
+      },
+      checkAmount() {
+        if (parseFloat(this.updateData.amount_tendered) >= parseFloat(this.updateData.rental_info.total_payment)) {
+          return true;
+        } else {
+          return 'Error! Amount tendered is less than the total payment.';
+        }
       },
       async uploadImage(event) {
         if (event) {
@@ -355,6 +350,18 @@
         this.restoreDialog = false;
         this.restoreData = null;
         this.isLoading = false;
+      },
+      async createPayment() {
+        const valid = this.$refs.form.validate();
+        if (valid) {
+          this.isLoading = true;
+          const { status, data } = await this.$store.dispatch('rentals/createPayment', this.updateData);
+          this.toastData(status, data);
+          this.inputDialog = false;
+          this.isLoading = false;
+        this.getRentals()
+
+        }
       },
       async deleteRental() {
         this.isLoading = true;

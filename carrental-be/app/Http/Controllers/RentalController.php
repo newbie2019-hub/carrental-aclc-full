@@ -21,7 +21,7 @@ class RentalController extends Controller
     }
 
     public function index(){
-        $rental = Rental::with(['car:id,car_brand_id,model,plate_number,year,seats,vehicle_identification_number', 'car.brand:id,brand,logo', 'rental_info', 'user.info'])->latest()->get();
+        $rental = Rental::with(['car:id,car_brand_id,model,plate_number,year,seats,vehicle_identification_number', 'car.brand:id,brand,logo', 'rental_info', 'user.info', 'payment'])->latest()->get();
         return $this->success('Rental data has been retrieved successfully!', $rental);
     }
 
@@ -41,7 +41,7 @@ class RentalController extends Controller
                 ]);
         
                 $stripecharge = new \Stripe\StripeClient('sk_test_51KAQ3ADoJANsLvgsci2nG46EFVHLQbFxS6qfZ8UEpGl1ffYIVcDBsHOOKu7SVI9MBTCjBm43dSu8oKhQSSsK1uaF00ivv1r0U3');
-                $stripecharge->charges->create([
+                $response = $stripecharge->charges->create([
                         "amount" => ($request->total + 5000)  * 100,
                         "currency" => "php",
                         "source" => $token,
@@ -62,9 +62,7 @@ class RentalController extends Controller
                 'driver_id' => $request->driver_id,
                 'driver_payment' => $request->driver_payment,
                 'drivers_license' => $request->drivers_license,
-                'total_payment' => (($request->total - $request->driver_payment) * .12)  + $request->total + 5000
-
-
+                'total_payment' => (($request->total - $request->driver_payment) * .12)  + $request->total + 5000,
             ];
 
             if($request->with_driver){
@@ -80,12 +78,13 @@ class RentalController extends Controller
                 'car_id' => $request->car_id,
                 'rentee_id' => auth()->user()->id,
                 'rental_info_id' => $rentalInfo->id,
+                'invoice' => $response->receipt_url,
                 'status' => 'On-going'
             ]);
 
             $rental->load(['user', 'rental_info']);
 
-            return $this->success('Rental created successfully!', $rental);
+            return response()->json(['msg' => 'Payment for rental is successful! You may check your account for the status', 'response' => $response]);
         }
         else {
             $data = [

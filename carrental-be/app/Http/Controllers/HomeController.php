@@ -24,7 +24,7 @@ class HomeController extends Controller
         $data['id'] = 0;
         $data['branch'] = 'All Branch';
 
-        $branch->put(count($branch) ,$data);
+        $branch->prepend('Show All Branch', 0);
         return response()->json([
             'msg' => 'Data retrieved successfully!',
             'branch' => $branch,

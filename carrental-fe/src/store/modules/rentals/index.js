@@ -66,6 +66,16 @@ export default {
 
    return res;
   },
+  async createPayment({ commit }, payload) {
+   const res = await API.post(`payment`, payload).then(res => {
+    // commit('CREATE_PAYMENT', res.data.data)
+    return res;
+   }).catch(err => {
+    return err.response;
+   })
+
+   return res;
+  },
  },
 
 }

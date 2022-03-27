@@ -150,7 +150,7 @@
                 On Branch
                 <v-icon small class="ml-1">mdi-receipt</v-icon>
               </v-btn>
-              <v-btn @click.prevent="createRent('Credit Card')" class="" color="primary" depressed :loading="isLoading">
+              <v-btn @click.prevent="paymentDialog = true" class="" color="primary" depressed :loading="isLoading">
                 Credit Card
                 <v-icon small class="ml-1">mdi-credit-card-outline</v-icon>
               </v-btn>
@@ -191,6 +191,47 @@
         </v-card-actions>
       </v-card>
     </v-dialog>
+
+    <v-dialog v-model="paymentDialog" max-width="460">
+      <v-card class="pt-6 pl-6 pr-5 pb-4">
+        <h3 class="fw-bold">Credit Card Payment</h3>
+        <p class="mt-1 mb-3">Please fill-in all the fields.</p>
+        <v-form ref="ccform" lazy-validation>
+          <v-text-field type="text" outlined hide-details="auto" dense class="mt-2" v-model="data.name" :rules="required" label="Name on Card" required></v-text-field>
+          <v-text-field type="text" outlined hide-details="auto" dense class="mt-2" v-model="data.number" :rules="required" label="Card Number" required></v-text-field>
+          <v-row dense>
+            <v-col>
+              <v-text-field type="number" outlined hide-details="auto" dense class="mt-2" v-model="data.cvc" :rules="required" label="CVC" required></v-text-field>
+            </v-col>
+            <v-col>
+              <v-text-field type="number" outlined hide-details="auto" dense class="mt-2" v-model="data.exp_month" :rules="required" label="Exp Month" required></v-text-field>
+            </v-col>
+            <v-col>
+              <v-text-field type="number" outlined hide-details="auto" dense class="mt-2" v-model="data.exp_year" :rules="required" label="Exp Year" required></v-text-field>
+            </v-col>
+          </v-row>
+          <v-card-actions class="mt-2">
+            <v-spacer></v-spacer>
+            <v-btn @click="createRent('Credit Card')" color="green" dark depressed>Proceed</v-btn>
+          </v-card-actions>
+        </v-form>
+      </v-card>
+    </v-dialog>
+
+    <v-dialog v-model="rentalCarDialog" max-width="460">
+      <v-card class="pt-6 pl-6 pr-5 pb-4">
+        <p class="text-h5 font-grotesk font-weight-bold mb-5">Rental Information</p>
+        <p class="mb-0"><span class="font-weight-bold">Rental Days:</span> {{ totalDays }}d</p>
+        <p class="mb-0"><span class="font-weight-bold">Rental Fee:</span> ₱ {{ formatCurrency(total - driversFee) }}</p>
+        <p class="mb-0"><span class="font-weight-bold">With Driver:</span> {{ data.with_driver ? 'Yes' : 'No' }}</p>
+        <p class="mb-0"><span class="font-weight-bold">Drivers Fee:</span> ₱ {{ formatCurrency(driversFee) }}</p>
+        <p><span class="font-weight-bold">Total Payment:</span> ₱ {{ formatCurrency(total) }} + ₱ {{ formatCurrency(5000) }} Security Deposit</p>
+        <v-card-actions class="mt-2">
+          <v-spacer></v-spacer>
+          <v-btn @click="rentalCarDialog = false" color="green" dark depressed>Close</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
   </div>
 </template>
 <script>
@@ -204,6 +245,7 @@
     data: () => ({
       rentalCarDialog: false,
       dialogCarPolicy: false,
+      paymentDialog: false,
       menu: false,
       menu2: false,
       date: '',
@@ -264,6 +306,11 @@
       async createRent(payment) {
         const valid = this.$refs.form.validate();
         if (valid) {
+          if (payment == 'Credit Card') {
+            const ccform = this.$refs.ccform.validate();
+            if (!ccform) return;
+          }
+
           this.isLoading = true;
           const carDataRent = {
             pickup_date: this.data.pickup_date,
@@ -287,14 +334,20 @@
           const { status, data } = await this.$store.dispatch('rentals/create', carDataRent);
           this.toastData(status, data);
           if (status == 200) {
-            window.open(`http://127.0.0.1:8000${data.data.invoice}`)
+            if (payment == 'On Branch') {
+              window.open(`http://127.0.0.1:8000${data.data.invoice}`);
+            } else {
+              window.open(data.response.receipt_url);
+            }
+            this.total = 0;
+            this.driversFee = 0;
+            this.isLoading = false;
+            this.$refs.form.reset();
+            this.data.with_driver = false;
+            this.data.days_with_driver = 1;
+            this.paymentDialog = false;
+            this.close();
           }
-          this.total = 0;
-          this.driversFee = 0;
-          this.isLoading = false;
-          this.$refs.form.reset();
-          this.data.with_driver = false;
-          this.close();
         }
       },
       dateDifference() {

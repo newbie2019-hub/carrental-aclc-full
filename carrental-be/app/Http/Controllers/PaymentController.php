@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Payment;
+use App\Models\RentalInfo;
 use Illuminate\Http\Request;
 use LaravelDaily\Invoices\Invoice;
 use LaravelDaily\Invoices\Classes\Buyer;
@@ -15,7 +17,19 @@ class PaymentController extends Controller
     }
 
     public function store(Request $request){
+        $payment = Payment::create([
+            'invoice' => 'Blank invoice',
+            'rental_id' => $request->id,
+            'total_payment' => $request->rental_info['total_payment'],
+            'change' => $request->amount_tendered - $request->rental_info['total_payment'],
+            'amount_tendered' => $request->amount_tendered
+        ]);
 
+        RentalInfo::where('id', $request->id)->update([
+            'payment_status' => 'Paid'
+        ]);
+        
+        return $this->success('Payment successful. The user may now get the car', $payment);
     }
 
     public function invoice($data){

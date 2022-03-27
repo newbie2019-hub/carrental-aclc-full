@@ -6,6 +6,15 @@ use Illuminate\Http\Request;
 
 class ImageController extends Controller
 {
+    public function storeLicense(Request $request){
+        if($request->image){
+            $fileName = 'image'.time().'.'.$request->image->extension();
+            $request->image->move(public_path('images'), $fileName);
+
+            return response()->json($fileName);
+        }
+    }
+
     public function store(Request $request){
         if($request->image){
             $fileName = 'image'.time().'.'.$request->image->extension();

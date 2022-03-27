@@ -16,9 +16,11 @@ export default {
    state.drivers.map((driver, i) => {
     if(driver.id == payload.id) {
      state.drivers[i].first_name = payload.first_name
+     state.drivers[i].middle_name = payload.middle_name
      state.drivers[i].last_name = payload.last_name
      state.drivers[i].gender = payload.gender
      state.drivers[i].address = payload.address
+     state.drivers[i].email = payload.email
      state.drivers[i].contact_number = payload.contact_number
     }
    })

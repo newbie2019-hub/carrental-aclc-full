@@ -14,8 +14,14 @@ class CarController extends Controller
     }
 
     public function index(){
-        $cars = Car::with(['brand', 'user', 'user.info', 'branch', 'rate'])->latest()->get();
-        return $this->success('Cars has been retrieved successfully!', $cars);
+        if(auth()->user()->info->role->role == 'Admin'){
+            $cars = Car::with(['brand', 'user', 'user.info', 'branch', 'rate'])->latest()->get();
+            return $this->success('Cars has been retrieved successfully!', $cars);
+        }
+        else {
+            $cars = Car::with(['brand', 'user', 'user.info', 'branch', 'rate'])->where('user_id', auth()->user()->id)->latest()->get();
+            return $this->success('Not Admin', $cars);
+        }
     }
 
     public function store(Request $request) {

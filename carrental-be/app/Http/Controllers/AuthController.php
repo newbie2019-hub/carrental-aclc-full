@@ -123,6 +123,9 @@ class AuthController extends Controller
 
             return response()->json($fileName);
         }
+        else {
+            return $this->error('No image found');
+        }
     }
 
     

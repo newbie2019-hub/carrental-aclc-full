@@ -70,13 +70,13 @@
     data: () => ({
       dialog: false,
       items: [
-        { title: 'Dashboard', icon: 'mdi-chart-pie', link: 'dashboard', role: 'Admin' },
-        { title: 'Branch', icon: 'mdi-source-branch', link: 'branch', role: 'Admin' },
-        { title: 'Cars', icon: 'mdi-car', link: 'cars', role: 'Admin' },
-        { title: 'Brands', icon: 'mdi-car-multiple', link: 'brands', role: 'Admin' },
+        { title: 'Dashboard', icon: 'mdi-chart-pie', link: 'dashboard', role: 'All' },
+        { title: 'Branch', icon: 'mdi-source-branch', link: 'branch', role: 'All' },
+        { title: 'Cars', icon: 'mdi-car', link: 'cars', role: 'All' },
+        { title: 'Brands', icon: 'mdi-car-multiple', link: 'brands', role: 'All' },
         { title: 'Users', icon: 'mdi-account-group-outline', link: 'users', role: 'Admin' },
         { title: 'Drivers', icon: 'mdi-account-group-outline', link: 'driver', role: 'Admin' },
-        { title: 'Rentals', icon: 'mdi-notebook', link: 'rentals', role: 'Admin' },
+        { title: 'Rentals', icon: 'mdi-notebook', link: 'rentals' , role: 'All'},
         { title: 'Inquiries', icon: 'mdi-forum', link: 'inquiries', role: 'Admin' },
       ],
       overwriteBreakpoint: false,
@@ -106,6 +106,7 @@
         this.$emit('close');
       },
       checkRole(item) {
+        if(item.role == 'All') return true
         if(item.role == 'Admin' && this.user.info.role.role == 'Admin') return true
       },
       async logout() {

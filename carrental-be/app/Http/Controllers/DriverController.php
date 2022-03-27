@@ -26,8 +26,9 @@ class DriverController extends Controller
             'contact_number' => $request->contact_number,
             'gender' => $request->gender,
             'address' => $request->address,
+            'email' => $request->email,
             'profile_img' => $request->profile_img_uploaded,
-            'valid_id' => $request->valid_id_uploaded,
+            'drivers_license' => $request->drivers_license,
         ]);
 
         return $this->success('Driver has been added successfully!', $driver);
@@ -44,10 +45,10 @@ class DriverController extends Controller
             'gender' => $request->gender,
             'address' => $request->address,
             'profile_img' => $request->profile_img_uploaded,
-            'valid_id' => $request->valid_id_uploaded,
+            'drivers_license' => $request->drivers_license,
         ]);
 
-        return $this->success('Driver has been added successfully!', $drivers);
+        return $this->success('Driver has been updated successfully!', $drivers);
     }
 
     public function destroy($id){

@@ -158,7 +158,7 @@
 
     <v-dialog v-model="inputDialog" max-width="420">
       <v-form ref="form" v-model="valid" @submit.prevent="saveDriver" lazy-validation class="pa-0 ma-0">
-        <v-card class="">
+        <v-card class="pb-2">
           <v-card-title class="text-h5"> {{ inputType == 'update' ? 'Update' : 'New' }} Driver </v-card-title>
           <v-card-subtitle>All fields are required</v-card-subtitle>
           <v-layout justify-center class="mb-5">
@@ -168,12 +168,11 @@
           </v-layout>
           <v-layout column class="mb-4 pr-4 pl-4">
             <v-file-input
-              @change="uploadImage"
-              v-model="updateData.image"
+              @change="uploadImageLicense"
+              v-model="updateData.licenseImg"
               prepend-icon=""
-              label="New Profile Image"
-              class=""
-              :rules="required"
+              label="Drivers License"
+              class="mt-2"
               accept="image/*"
               prepend-inner-icon="mdi-paperclip"
               outlined
@@ -183,30 +182,49 @@
               truncate-length="15"
             >
             </v-file-input>
-            <v-text-field
-              prepend-inner-icon="mdi-card-bulleted"
-              outlined
-              hide-details="auto"
-              dense
+            <v-file-input
+              @change="uploadImage"
+              v-model="updateData.profileImg"
+              prepend-icon=""
+              label="Profile Image"
               class="mt-2"
-              v-model="updateData.first_name"
-              :rules="required"
-              label="First Name"
-              required
-            ></v-text-field>
-            <v-text-field
-              prepend-inner-icon="mdi-card-bulleted"
+              accept="image/*"
+              prepend-inner-icon="mdi-paperclip"
               outlined
-              hide-details="auto"
               dense
-              class="mt-2"
-              v-model="updateData.middle_name"
-              :rules="required"
-              label="Middle Name"
-              required
-            ></v-text-field>
+              hide-details="auto"
+              show-size
+              truncate-length="15"
+            >
+            </v-file-input>
+            <v-text-field outlined hide-details="auto" dense class="mt-2" v-model="updateData.first_name" :rules="required" label="First Name" required></v-text-field>
+            <v-text-field outlined hide-details="auto" dense class="mt-2" v-model="updateData.middle_name" label="Middle Name" required></v-text-field>
+            <v-text-field outlined hide-details="auto" dense class="mt-2" v-model="updateData.last_name" :rules="required" label="Last Name" required></v-text-field>
+            <v-select class="mt-2" v-model="updateData.gender" :rules="required" :items="gender" label="Gender" hide-details="auto" outlined dense></v-select>
+            <v-text-field outlined hide-details="auto" dense class="mt-2" v-model="updateData.contact_number" :rules="required" label="Contact Number" required></v-text-field>
+            <v-textarea outlined hide-details="auto" dense class="mt-2" v-model="updateData.address" :rules="required" label="Address" auto-grow rows="2" required></v-textarea>
+            <v-menu ref="menu" v-model="menu" :close-on-content-click="false" transition="scale-transition" offset-y min-width="auto">
+              <template v-slot:activator="{ on, attrs }">
+                <v-text-field
+                  v-model="updateData.birthday"
+                  label="Date of Birth"
+                  append-icon="mdi-calendar"
+                  readonly
+                  class="mt-2"
+                  v-bind="attrs"
+                  hide-details="auto"
+                  v-on="on"
+                  :loading="isLoading"
+                  :rules="required"
+                  dense
+                  outlined
+                ></v-text-field>
+              </template>
+              <v-date-picker v-model="updateData.birthday" :active-picker.sync="activePicker" min="1960-01-01" :max="maxBirthDate" @change="save" landscape></v-date-picker>
+            </v-menu>
+            <v-text-field outlined hide-details="auto" dense class="mt-2" v-model="updateData.email" :rules="required" label="Email" required></v-text-field>
           </v-layout>
-          <v-card-actions>
+          <v-card-actions class="">
             <v-spacer></v-spacer>
             <v-btn color="grey darken-2" text @click="inputDialog = false"> Cancel </v-btn>
             <v-btn color="green darken-1" text type="submit" :loading="isLoading"> {{ inputType == 'update' ? 'Update' : 'Save' }} </v-btn>
@@ -255,16 +273,28 @@
       search: '',
       searchArchived: '',
       valid: true,
+      activePicker: null,
+      menu: false,
       archiveDialog: false,
       viewInfoDialog: false,
       deleteDialog: false,
       restoreDialog: false,
       inputDialog: false,
       inputType: null,
+      maxBirthDate: '',
       updateData: {
         brand: '',
         logo: '',
         image: '',
+        first_name: '',
+        middle_name: '',
+        last_name: '',
+        gender: '',
+        address: '',
+        licenseImg: '',
+        profileImg: '',
+        birthday: '',
+        profile_img_uploaded: ''
       },
       deleteData: {
         id: null,
@@ -318,12 +348,23 @@
         { text: 'Deleted On', value: 'deleted_at' },
         { text: 'Actions', value: 'actions' },
       ],
+      gender: [
+        {
+          text: 'Male',
+          value: 'Male'
+        },
+        {
+          text: 'Female',
+          value: 'Female'
+        },
+      ]
     }),
     async mounted() {
       this.isLoading = true;
       await this.$store.dispatch('auth/checkUser');
       await this.getDrivers();
       await this.getArchivedDrivers();
+      this.maxDate()
       this.isLoading = false;
     },
     methods: {
@@ -347,17 +388,42 @@
           },
         });
       },
-      async uploadImage(event) {
+      async uploadImageLicense(event) {
         if (event) {
           let formData = new FormData();
           formData.append('image', event);
-          await API.post(`upload-image`, formData, {
+          await API.post(`upload-image-license`, formData, {
             headers: {
               'Content-Type': 'multipart/form-data',
             },
           })
             .then((response) => {
-              this.updateData.profile_img = response.data;
+              this.updateData.drivers_license = response.data;
+            })
+            .catch((error) => {
+              console.log({ error });
+            });
+        }
+      },
+      maxDate() {
+        const date = new Date();
+        const newDate = (date.getFullYear() - 17).toString() + '-01-01';
+        this.maxBirthDate = newDate;
+      },
+      save(date) {
+        this.$refs.menu.save(date);
+      },
+      async uploadImage(event) {
+        if (event) {
+          let formData = new FormData();
+          formData.append('profile_img', event);
+          await API.post(`upload-profile`, formData, {
+            headers: {
+              'Content-Type': 'multipart/form-data',
+            },
+          })
+            .then((response) => {
+              this.updateData.profile_img_uploaded = response.data;
             })
             .catch((error) => {
               console.log({ error });
@@ -405,11 +471,11 @@
         if (valid) {
           this.isLoading = true;
           if (this.inputType == 'create') {
-            const { status, data } = await this.$store.dispatch('drivers/newBrand', this.updateData);
+            const { status, data } = await this.$store.dispatch('drivers/newDriver', this.updateData);
             this.toastData(status, data);
           }
           if (this.inputType == 'update') {
-            const { status, data } = await this.$store.dispatch('drivers/updateBrand', this.updateData);
+            const { status, data } = await this.$store.dispatch('drivers/updateDriver', this.updateData);
             this.toastData(status, data);
           }
           this.inputDialog = false;

@@ -35,6 +35,10 @@ class Rental extends Model
         return $this->belongsTo(RentalInfo::class, 'rental_info_id', 'id')->withTrashed();
     }
 
+    public function payment(){
+        return $this->hasOne(Payment::class, 'rental_id', 'id');
+    }
+
     public function setTransactionNumberAttribute($transaction_number){
         return $this->attributes['transaction_number'] = time() . $this->id;
     }

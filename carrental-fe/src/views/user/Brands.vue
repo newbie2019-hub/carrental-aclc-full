@@ -58,7 +58,7 @@
               <img v-if="item.logo" :src="`http://127.0.0.1:8000/images/logo/${item.logo}`" />
             </v-avatar>
           </template>
-          <template v-slot:item.actions="{ item }">
+          <template v-if="user.info.role.role == 'Admin'" v-slot:item.actions="{ item }">
             <v-layout>
               <v-btn
                 @click="
@@ -101,7 +101,7 @@
               <img v-if="item.logo" :src="`http://127.0.0.1:8000/images/logo/${item.logo}`" />
             </v-avatar>
           </template>
-          <template v-slot:item.actions="{ item }">
+          <template v-if="user.info.role.role == 'Admin'" v-slot:item.actions="{ item }">
             <v-layout>
               <v-btn
                 @click="
@@ -350,6 +350,7 @@
     },
     computed: {
       ...mapState('brands', ['brands', 'archivedBrands']),
+      ...mapState('auth', ['user']),
     },
     watch: {
       inputDialog() {

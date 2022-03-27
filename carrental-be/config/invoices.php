@@ -9,7 +9,7 @@ return [
         /*
          * Due date for payment since invoice's date.
          */
-        'pay_until_days' => 7,
+        'pay_until_days' => 2,
     ],
 
     'serial_number' => [
@@ -35,7 +35,7 @@ return [
          *
          * Example: Amount in words: Eight hundred fifty thousand sixty-eight EUR and fifteen ct.
          */
-        'fraction' => 'ct.',
+        'fraction' => 'cents',
         'symbol'   => '€',
         /*
          * Example: 19.00
@@ -49,12 +49,12 @@ return [
          * By default empty.
          * Example: 1,999.00
          */
-        'thousands_separator' => '',
+        'thousands_separator' => ',',
         /*
          * Supported tags {VALUE}, {SYMBOL}, {CODE}
          * Example: 1.99 €
          */
-        'format' => '{VALUE} {SYMBOL}',
+        'format' => '{SYMBOL}{VALUE}',
     ],
 
     'paper' => [
