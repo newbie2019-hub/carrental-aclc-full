@@ -39,7 +39,7 @@ class CarFactory extends Factory
             'mileage' => $this->faker->numberBetween(0, 60000),
             'year' => $this->faker->biasedNumberBetween(1998,2017, 'sqrt'),
             'transmission' => $this->faker->vehicleGearBoxType,
-            'for_rent_status' => 'Approved'
+            'for_rent_status' => $this->faker->randomElement(['Approved','Pending'])
         ];
     }
 }

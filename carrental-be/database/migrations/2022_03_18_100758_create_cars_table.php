@@ -27,6 +27,7 @@ return new class extends Migration
             $table->string('model');
             $table->string('year');
             $table->string('transmission');
+            $table->string('rental_status')->default('Available');
             $table->string('for_rent_status')->default('Pending');
             $table->foreignId('car_rate_id')->constrained()->onDelete('cascade');
             $table->foreignId('car_brand_id')->constrained()->onDelete('cascade');

@@ -17,6 +17,13 @@ export default {
   ADD_CAR(state, payload) {
    state.cars.unshift(payload)
   },
+  APPROVE_CAR(state, payload) {
+   state.cars.map((car, i) => {
+    if(car.id == payload.id) {
+     state.cars[i].for_rent_status = 'Approved'
+    }
+   })
+  },
   UPDATE_CAR(state, payload) {
    state.cars.map((car, i) => {
     if(car.id == payload.id) {
@@ -71,6 +78,16 @@ export default {
   }
  },
  actions: {
+  async approveCar({ commit }, payload) {
+   const res = await API.put(`cars/approve/${payload.id} }`).then(res => {
+    commit('APPROVE_CAR', res.data.data)
+    return res;
+   }).catch(err => {
+    return err.response;
+   })
+
+   return res;
+  },
   async newCar({ commit }, payload) {
    const res = await API.post(`cars?token=${ localStorage.getItem('auth') }`, payload).then(res => {
     commit('ADD_CAR', res.data.data)

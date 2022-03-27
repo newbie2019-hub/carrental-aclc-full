@@ -12,6 +12,7 @@ use App\Http\Controllers\ArchivedUsersController;
 use App\Http\Controllers\BranchController;
 use App\Http\Controllers\BrandController;
 use App\Http\Controllers\CarController;
+use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DriverController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\ImageController;
@@ -51,6 +52,7 @@ Route::middleware('api')->group(function () {
     });
     
     Route::apiResource('archived-cars', ArchivedCarsController::class);
+    Route::put('cars/approve/{id}', [CarController::class, 'approveCar']);
     Route::apiResource('cars', CarController::class);
     
     Route::apiResource('archived-brands', ArchivedBrandsController::class);
@@ -67,6 +69,8 @@ Route::middleware('api')->group(function () {
 
     Route::apiResource('archived-rentals', ArchivedRentalController::class);
     Route::apiResource('rentals', RentalController::class);
+
+    Route::get('dashboard', [DashboardController::class, 'index']);
 
     Route::post('payment', [PaymentController::class, 'store']);
     Route::get('home', [HomeController::class, 'index']);

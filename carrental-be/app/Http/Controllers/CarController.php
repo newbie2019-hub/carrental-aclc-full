@@ -20,8 +20,19 @@ class CarController extends Controller
         }
         else {
             $cars = Car::with(['brand', 'user', 'user.info', 'branch', 'rate'])->where('user_id', auth()->user()->id)->latest()->get();
-            return $this->success('Not Admin', $cars);
+            return $this->success('Cars has been retrieved successfully!', $cars);
         }
+    }
+
+    public function approveCar($id){
+        $car = Car::where('id', $id)->first();
+        $car->update([
+            'for_rent_status' => 'Approve'
+        ]);
+
+        $car->load(['user', 'user.info', 'branch', 'brand', 'rate']);
+
+        return $this->success('Car has been approved for rental', $car);
     }
 
     public function store(Request $request) {

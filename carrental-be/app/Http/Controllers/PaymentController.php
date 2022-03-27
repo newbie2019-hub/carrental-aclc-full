@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Car;
 use App\Models\Payment;
+use App\Models\Rental;
 use App\Models\RentalInfo;
 use Illuminate\Http\Request;
 use LaravelDaily\Invoices\Invoice;
@@ -27,6 +29,12 @@ class PaymentController extends Controller
 
         RentalInfo::where('id', $request->id)->update([
             'payment_status' => 'Paid'
+        ]);
+
+        $rental = Rental::where('id', $request->id)->first();
+        $car = Car::where('id', $rental->car_id)->first();
+        $car->update([
+            'rental_status' => 'On-going'
         ]);
         
         return $this->success('Payment successful. The user may now get the car', $payment);

@@ -52,7 +52,7 @@
           <v-spacer></v-spacer>
           <v-text-field v-model="search" outlined dense append-icon="mdi-magnify" class="mb-5" label="Search" single-line hide-details></v-text-field>
         </v-card-title>
-        <v-data-table :headers="headers" :items="rentals" :search="search" :loading="isLoading" :loading-text="'Retrieving drivers data. Please wait ...'">
+        <v-data-table :headers="headers" :items="rentals" :search="search" :loading="isLoading" :loading-text="'Retrieving rentals data. Please wait ...'">
           <template v-slot:item.invoice="{ item }">
             <a v-if="item.rental_info.payment_type == 'On Branch'" class="text-decoration-none" :href="`http://127.0.0.1:8000${item.invoice}`" target="_">View Invoice</a>
             <a v-else class="text-decoration-none" :href="`${item.invoice}`" target="_">View Invoice</a>

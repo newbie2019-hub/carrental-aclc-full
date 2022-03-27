@@ -40,6 +40,7 @@
       <v-col>
         <v-card-title>
           <v-btn
+           v-if="user.info.role.role == 'Admin'"
             color="green"
             @click="
               inputDialog = true;

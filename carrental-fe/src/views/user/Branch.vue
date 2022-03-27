@@ -40,6 +40,7 @@
       <v-col>
         <v-card-title>
           <v-btn
+            v-if="user.info.role.role == 'Admin'"
             color="green"
             @click="
               inputDialog = true;
@@ -53,7 +54,7 @@
           <v-text-field v-model="search" outlined dense append-icon="mdi-magnify" class="mb-5" label="Search" single-line hide-details></v-text-field>
         </v-card-title>
         <v-data-table :headers="headers" :items="branch" :search="search" :loading="isLoading" :loading-text="'Retrieving users data. Please wait ...'">
-          <template v-slot:item.actions="{ item }">
+          <template  v-if="user.info.role.role == 'Admin'" v-slot:item.actions="{ item }">
             <v-layout>
               <v-btn
                 @click="
@@ -91,7 +92,7 @@
           <v-text-field v-model="searchArchived" outlined dense append-icon="mdi-magnify" class="mb-5" label="Search" single-line hide-details></v-text-field>
         </v-card-title>
         <v-data-table :headers="archivedHeaders" :items="archivedBranch" :search="searchArchived" :loading="isLoading" :loading-text="'Retrieving users data. Please wait ...'">
-          <template v-slot:item.actions="{ item }">
+          <template  v-if="user.info.role.role == 'Admin'" v-slot:item.actions="{ item }">
             <v-layout>
               <v-btn
                 @click="
@@ -218,7 +219,7 @@
         },
         { text: 'Address', value: 'address' },
         { text: 'Description', value: 'description' },
-        { text: 'Assignee', value: 'assignee' },
+        // { text: 'Assignee', value: 'assignee' },
         { text: 'Added on', value: 'created_at' },
         { text: 'Actions', value: 'actions' },
       ],
@@ -231,7 +232,7 @@
         },
         { text: 'Address', value: 'address' },
         { text: 'Description', value: 'description' },
-        { text: 'Assignee', value: 'assignee' },
+        // { text: 'Assignee', value: 'assignee' },
         { text: 'Deleted On', value: 'deleted_at' },
         { text: 'Actions', value: 'actions' },
       ],
@@ -292,8 +293,8 @@
             const { status, data } = await this.$store.dispatch('branch/updateBranch', this.updateData);
             this.toastData(status, data);
           }
-          this.inputDialog = false
-          this.$refs.form.reset()
+          this.inputDialog = false;
+          this.$refs.form.reset();
           this.isLoading = false;
         }
       },
@@ -303,13 +304,14 @@
     },
     computed: {
       ...mapState('branch', ['branch', 'archivedBranch']),
+      ...mapState('auth', ['user']),
     },
     watch: {
       inputDialog() {
         if (this.inputType == 'create') {
           this.valid = true;
-          this.updateData = {branch: '', address: '', user_id: '', description: ''}
-          this.$refs.form.resetValidation()
+          this.updateData = { branch: '', address: '', user_id: '', description: '' };
+          this.$refs.form.resetValidation();
         }
       },
     },

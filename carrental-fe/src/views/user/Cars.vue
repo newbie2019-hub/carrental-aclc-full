@@ -97,6 +97,7 @@
                 >Update</v-btn
               >
               <v-btn
+              v-if="item.rental_status != 'On-going'"
                 @click="
                   deleteData = item;
                   archiveDialog = true;
@@ -438,6 +439,7 @@
         <v-card-actions>
           <v-spacer></v-spacer>
           <v-btn color="grey darken-1" text @click="carInfoDialog = false"> Close </v-btn>
+          <v-btn v-if="carData.for_rent_status == 'Pending' && user.info.role.role == 'Admin'" color="primary darken-1" text @click="approveCar"> Approve </v-btn>
           <v-btn color="green darken-1" text @click="showRentCar(carData)"> Rent </v-btn>
         </v-card-actions>
       </v-card>
@@ -445,7 +447,6 @@
   </div>
 </template>
 <script>
-  import moment from 'moment';
   import { mapState } from 'vuex';
   import API from '../../store/base/index';
   export default {
@@ -534,6 +535,7 @@
       isModalVisible: false,
       headers: [
         { text: 'Image', value: 'image', sortable: false },
+        { text: 'Rent Status', value: 'rental_status', sortable: true },
         {
           text: 'Brand',
           align: 'start',
@@ -558,6 +560,7 @@
       ],
       archivedHeaders: [
         { text: 'Image', value: 'image', sortable: false },
+        { text: 'Rent Status', value: 'rental_status', sortable: true },
         {
           text: 'Brand',
           align: 'start',
@@ -591,6 +594,12 @@
       this.isLoading = false;
     },
     methods: {
+      async approveCar() {
+        this.isLoading = true;
+        const { status, data } = await this.$store.dispatch('cars/approveCar', this.carData);
+        this.toastData(status, data);
+        this.isLoading = false;
+      },
       showProfile(url) {
         this.$viewerApi({
           images: [`http://127.0.0.1:8000/images/cars/${url}`],

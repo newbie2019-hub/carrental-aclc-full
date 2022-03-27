@@ -84,6 +84,13 @@ class RentalController extends Controller
 
             $rental->load(['user', 'rental_info']);
 
+            $car = Car::where('id', $request->car_id)->first();
+            if($car){
+                $car->update([
+                    'rental_status' => 'Rented'
+                ]);
+            }
+
             return response()->json(['msg' => 'Payment for rental is successful! You may check your account for the status', 'response' => $response]);
         }
         else {
@@ -116,6 +123,14 @@ class RentalController extends Controller
             ]);
 
             $rental->load(['user', 'rental_info', 'car']);
+
+            
+            $car = Car::where('id', $request->car_id)->first();
+            if($car){
+                $car->update([
+                    'rental_status' => 'Reserved'
+                ]);
+            }
             return $this->success('You can proceed to your account to check for your rental', $rental);
         }
     }
