@@ -33,6 +33,9 @@ class PaymentController extends Controller
 
         $rental = Rental::where('id', $request->id)->first();
         $car = Car::where('id', $rental->car_id)->first();
+        $rental->update([
+            'status' => 'On-going'
+        ]);
         $car->update([
             'rental_status' => 'On-going'
         ]);

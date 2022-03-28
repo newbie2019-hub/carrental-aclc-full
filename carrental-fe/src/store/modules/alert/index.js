@@ -17,7 +17,9 @@ export default {
     //  console.log(payload)
      if(typeof payload.msg === 'object'){
       for (const [key, value] of Object.entries(payload.msg)) {
-        state.msg += `${value}\n`
+        if(value){
+          state.msg += `${value}\n`
+        }
       }
      }
      else {

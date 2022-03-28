@@ -236,6 +236,8 @@
         { text: 'Email', value: 'email' },
         { text: 'Gender', value: 'info.gender' },
         { text: 'Date of Birth', value: 'birthday' },
+        { text: 'Owned Cars', value: 'cars_count' },
+
         { text: 'Contact Number', value: 'info.contact_number' },
         { text: 'Date Created', value: 'created_at' },
         { text: 'Actions', value: 'actions' },
@@ -252,6 +254,7 @@
         { text: 'Email', value: 'email' },
         { text: 'Gender', value: 'info.gender' },
         { text: 'Date of Birth', value: 'birthday' },
+        { text: 'Owned Cars', value: 'cars_count' },
         { text: 'Contact Number', value: 'info.contact_number' },
         { text: 'Date Created', value: 'created_at' },
         { text: 'Deleted On', value: 'deleted_at' },

@@ -13,7 +13,7 @@ class UserController extends Controller
     }
 
     public function index(){
-        $users = User::with(['info'])->where('id', '<>', auth()->user()->id)->latest()->get();
+        $users = User::withCount(['cars'])->with(['info'])->where('id', '<>', auth()->user()->id)->latest()->get();
         return $this->success('User accounts has been retrieved successfully!', $users);
     }
 

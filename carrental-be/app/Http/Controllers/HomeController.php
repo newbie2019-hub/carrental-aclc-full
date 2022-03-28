@@ -22,9 +22,9 @@ class HomeController extends Controller
 
         $data = array();
         $data['id'] = 0;
-        $data['branch'] = 'All Branch';
+        $data['branch'] = 'Show All Branch';
 
-        $branch->prepend('Show All Branch', 0);
+        $branch->prepend($data, 0);
         return response()->json([
             'msg' => 'Data retrieved successfully!',
             'branch' => $branch,

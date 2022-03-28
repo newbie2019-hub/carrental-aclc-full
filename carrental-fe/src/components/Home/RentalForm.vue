@@ -341,13 +341,15 @@
             }
             this.total = 0;
             this.driversFee = 0;
-            this.isLoading = false;
             this.$refs.form.reset();
             this.data.with_driver = false;
             this.data.days_with_driver = 1;
             this.paymentDialog = false;
+            await this.$store.dispatch('home/getData');
+
             this.close();
           }
+          this.isLoading = false;
         }
       },
       dateDifference() {

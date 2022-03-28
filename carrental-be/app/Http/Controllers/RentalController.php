@@ -21,11 +21,48 @@ class RentalController extends Controller
     }
 
     public function index(){
-        $rental = Rental::with(['car:id,car_brand_id,model,plate_number,year,seats,vehicle_identification_number', 'car.brand:id,brand,logo', 'rental_info', 'user.info', 'payment'])->latest()->get();
-        return $this->success('Rental data has been retrieved successfully!', $rental);
+        if(auth()->user()->info->role->role == 'Admin'){
+            $rental = Rental::with(['car:id,rental_status,car_brand_id,model,plate_number,year,seats,vehicle_identification_number', 'car.brand:id,brand,logo', 'rental_info', 'user.info', 'payment'])->latest()->get();
+            return $this->success('Rental data has been retrieved successfully!', $rental);
+        }
+        else {
+            $rental = Rental::whereRelation('car', 'user_id', auth()->user()->id)->with(['car:id,rental_status,car_brand_id,model,plate_number,year,seats,vehicle_identification_number', 'car.brand:id,brand,logo', 'rental_info', 'user.info', 'payment'])->latest()->get();
+            return $this->success('Rental data has been retrieved successfully!', $rental);
+        }
+    }
+
+    public function markFinished($id){
+        $rental = Rental::where('id', $id)->first();
+        $rental->update([
+            'status' => 'Finished'
+        ]);
+
+        $rental->load(['car']);
+
+        $rental->car->update([
+            'rental_status' => 'Available'
+        ]);
+
+        return $this->success('Rental has been marked as finished successfully!', $rental);
     }
 
     public function store(Request $request){
+
+        $car = Car::where('id', $request->car_id)->first();
+
+        if($car->user_id == auth()->user()->id){
+            return $this->error('You cannot rent your own car');
+        }
+
+        $rental = Rental::with(['rental_info'])->where('car_id', $request->car_id)->where(function ($query){
+            $query->where('status', 'Pending')
+            ->orWhere('status', 'On-going');
+        })->first();
+
+        if($car->rental_status != 'Available'){
+            return $this->error('This car is not available for rent. ETA: ' . $rental->rental_info->return_date);
+        }
+
         $response = '';
         if($request->payment_type == 'Credit Card'){
             try {
@@ -160,7 +197,7 @@ class RentalController extends Controller
         ->title($car->brand->brand . ' ' . $car->model)
         ->quantity($data->totalDays)
         ->taxByPercent(12)
-        ->pricePerUnit($data->rentalPayment / $data->totalDays);
+        ->pricePerUnit(($data->total - $data->driver_payment) / $data->totalDays);
 
         $securityDeposit = (new InvoiceItem())
         ->title('Security Deposit')
@@ -175,37 +212,33 @@ class RentalController extends Controller
             ->pricePerUnit($data->driver_payment / $data->days_with_driver);
         }
 
-        $notes = [
-            'Please pay on or before the specified date.',
-            'If you were not able to pay your transaction will be cancelled',
-            'Thank You!',
-        ];
-        $notes = implode("<br>", $notes);
+        // $notes = [
+        //     'Please pay on or before the specified date.',
+        //     'If you were not able to pay your transaction will be cancelled',
+        //     'Thank You!',
+        // ];
+        // $notes = implode("<br>", $notes);
         
         if($data->with_driver){
             $invoice = Invoice::make()
                 ->buyer($customer)
                 ->seller($client)
-                ->notes($notes)
                 ->currencySymbol('₱')
                 ->currencyCode('PHP')
                 ->currencyFormat('{SYMBOL}{VALUE}')
                 ->addItem($item)
                 ->addItem($driver)
                 ->addItem($securityDeposit)
-                ->payUntilDays(2)
                 ->save('invoice');
         }
         else {
             $invoice = Invoice::make()
                 ->buyer($customer)
                 ->seller($client)
-                ->notes($notes)
                 ->currencySymbol('₱')
                 ->currencyCode('PHP')
                 ->currencyFormat('{SYMBOL}{VALUE}')
                 ->addItem($item)
-                ->payUntilDays(2)
                 ->save('invoice');
         }
 
@@ -215,7 +248,13 @@ class RentalController extends Controller
 
     public function destroy($id){
         Rental::destroy($id);
-        $rental = Rental::onlyTrashed()->with(['car', 'user', 'user.info', 'rental_info'])->where('id', $id)->first();
+        $rental = Rental::onlyTrashed()->with(['brand', 'car', 'user', 'user.info', 'rental_info'])->where('id', $id)->first();
+        $rental->update([
+            'status' => 'Cancelled'
+        ]);
+        $rental->car->update([
+            'rental_status' => 'Available'
+        ]);
         return $this->success('Rental transaction has been archived', $rental);
     }
 }

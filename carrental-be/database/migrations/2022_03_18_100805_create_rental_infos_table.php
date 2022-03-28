@@ -15,8 +15,8 @@ return new class extends Migration
     {
         Schema::create('rental_infos', function (Blueprint $table) {
             $table->id();
-            $table->dateTime('pickup_date');
-            $table->dateTime('return_date');
+            $table->date('pickup_date');
+            $table->date('return_date');
             $table->text('additional_instruction')->nullable();
             $table->string('payment_status');
             $table->string('with_driver');

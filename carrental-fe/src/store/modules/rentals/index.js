@@ -13,6 +13,13 @@ export default {
   SET_RENTALS(state, payload) {
    state.rentals = payload
   },
+  MARK_AS_FINISHED(state, payload) {
+   state.rentals.map((rental, i) => {
+    if(rental.id == payload.id){
+     state.rentals[i].status = 'Finished'
+    }
+   }) 
+  },
   SET_ARCHIVED_RENTALS(state, payload) {
    state.archivedRentals = payload
   },
@@ -49,6 +56,16 @@ export default {
   async getArchivedRentals({ commit }, payload) {
    const res = await API.get('archived-rentals', payload).then(res => {
     commit('SET_ARCHIVED_RENTALS', res.data.data)
+    return res;
+   }).catch(err => {
+    return err.response;
+   })
+
+   return res;
+  },
+  async finishedRental({ commit }, payload) {
+   const res = await API.put(`rentals/finished/${ payload.id }`, payload).then(res => {
+    commit('MARK_AS_FINISHED', res.data.data)
     return res;
    }).catch(err => {
     return err.response;

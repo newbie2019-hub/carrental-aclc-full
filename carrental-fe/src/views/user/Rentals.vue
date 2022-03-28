@@ -57,6 +57,9 @@
             <a v-if="item.rental_info.payment_type == 'On Branch'" class="text-decoration-none" :href="`http://127.0.0.1:8000${item.invoice}`" target="_">View Invoice</a>
             <a v-else class="text-decoration-none" :href="`${item.invoice}`" target="_">View Invoice</a>
           </template>
+          <template v-slot:item.status="{ item }">
+            <v-chip small dark :color="getChipColor(item.status)">{{ item.status }}</v-chip>
+          </template>
           <template v-slot:item.user.info.last_name="{ item }">
             <p class="text-no-wrap">{{ item.user.info.last_name }}, {{ item.user.info.first_name }} {{ item.user.info.middle_name ? item.user.info.middle_name[0] : '' }}</p>
           </template>
@@ -64,13 +67,23 @@
             <p class="text-no-wrap">₱ {{ formatCurrency(item.rental_info.total_payment) }}</p>
           </template>
           <template v-slot:item.rental_info.payment_status="{ item }">
-            <v-chip small dark :color="item.rental_info.payment_status == 'Pending' ? 'red' : 'green'">{{item.rental_info.payment_status}}</v-chip>
+            <v-chip small dark :color="item.rental_info.payment_status == 'Pending' ? 'red' : 'green'">{{ item.rental_info.payment_status }}</v-chip>
           </template>
           <template v-slot:item.car.brand.brand="{ item }">
             <p class="text-no-wrap">{{ item.car.brand.brand }} {{ item.car.model }} - {{ item.car.year }}</p>
           </template>
           <template v-slot:item.actions="{ item }">
             <v-layout>
+              <v-btn
+                v-if="item.status == 'On-going' && item.rental != 'Finished'"
+                @click="
+                  finishedDialog = true;
+                  deleteData = item;
+                "
+                small
+                text
+                color="green darken-1"
+                >Finished</v-btn>
               <v-btn
                 v-if="item.rental_info.payment_status != 'Paid'"
                 @click="
@@ -81,8 +94,10 @@
                 small
                 text
                 color="green darken-1"
-                >Payment</v-btn>
+                >Payment</v-btn
+              >
               <v-btn
+              v-if="item.status != 'Finished'"
                 @click="
                   deleteData = item;
                   archiveDialog = true;
@@ -110,6 +125,9 @@
           <template v-slot:item.invoice="{ item }">
             <a class="text-decoration-none" :href="`http://127.0.0.1:8000${item.invoice}`" target="_">View Invoice</a>
           </template>
+          <template v-slot:item.status="{ item }">
+            <v-chip small dark color="grey">{{ item.status }}</v-chip>
+          </template>
           <template v-slot:item.user.info.last_name="{ item }">
             <p class="text-no-wrap">{{ item.user.info.last_name }}, {{ item.user.info.first_name }} {{ item.user.info.middle_name ? item.user.info.middle_name[0] : '' }}</p>
           </template>
@@ -117,29 +135,26 @@
             <p class="text-no-wrap">₱ {{ formatCurrency(item.rental_info.total_payment) }}</p>
           </template>
           <template v-slot:item.rental_info.payment_status="{ item }">
-            <v-chip small dark :color="item.rental_info.payment_status == 'Pending' ? 'red' : 'green'">{{item.rental_info.payment_status}}</v-chip>
+            <v-chip small dark :color="item.rental_info.payment_status == 'Pending' ? 'red' : 'green'">{{ item.rental_info.payment_status }}</v-chip>
           </template>
           <template v-slot:item.car.brand.brand="{ item }">
             <p class="text-no-wrap">{{ item.car.brand.brand }} {{ item.car.model }} - {{ item.car.year }}</p>
           </template>
-          <!-- 
-          <template v-slot:item.actions="{ item }">
-            <v-layout>
-              <v-btn
-                @click="
-                  restoreDialog = true;
-                  restoreData = item;
-                "
-                small
-                text
-                color="grey darken-1"
-                >Cancel</v-btn
-              >
-            </v-layout>
-          </template> -->
         </v-data-table>
       </v-col>
     </v-row>
+
+    <v-dialog v-model="finishedDialog" max-width="420">
+      <v-card>
+        <v-card-title class="text-h5"> Confirm Action </v-card-title>
+        <v-card-text class=""> Are you sure you want to mark this transaction as finished? <span class="red--text">Note: You cannot undo this action</span> </v-card-text>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn color="grey darken-2" text @click="finishedDialog = false"> Cancel </v-btn>
+          <v-btn color="green darken-1" text @click="finishedRental" :loading="isLoading"> Proceed </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
 
     <v-dialog v-model="archiveDialog" max-width="420">
       <v-card>
@@ -147,7 +162,7 @@
         <v-card-text class=""> Are you sure you want to cancel this transaction? </v-card-text>
         <v-card-actions>
           <v-spacer></v-spacer>
-          <v-btn color="grey darken-2" text @click="archiveDialog = false"> Cancel </v-btn>
+          <!-- <v-btn color="grey darken-2" text @click="archiveDialog = false"> Cancel </v-btn> -->
           <v-btn color="red darken-1" text @click="archiveRental" :loading="isLoading"> Cancel </v-btn>
         </v-card-actions>
       </v-card>
@@ -171,7 +186,7 @@
               required
             ></v-text-field>
           </v-layout>
-          <p class="mb-5 ml-4">Total Amount: ₱ {{formatCurrency(updateData.rental_info.total_payment)}}</p>
+          <p class="mb-5 ml-4">Total Amount: ₱ {{ formatCurrency(updateData.rental_info.total_payment) }}</p>
           <v-card-actions>
             <v-spacer></v-spacer>
             <v-btn color="grey darken-2" text @click="inputDialog = false"> Cancel </v-btn>
@@ -227,14 +242,15 @@
       restoreDialog: false,
       inputDialog: false,
       inputType: null,
+      finishedDialog: false,
       updateData: {
         brand: '',
         logo: '',
         image: '',
         amount_tendered: '',
         rental_info: {
-          total_payment: 0
-        }
+          total_payment: 0,
+        },
       },
       deleteData: {
         id: null,
@@ -243,6 +259,7 @@
       isModalVisible: false,
       headers: [
         { text: 'Transaction No.', value: 'transaction_number' },
+        { text: 'Rental Status', value: 'status' },
         { text: 'Rentee', value: 'user.info.last_name' },
         { text: 'Car', value: 'car.brand.brand' },
         { text: 'Pick Up Date', value: 'rental_info.pickup_date' },
@@ -257,13 +274,14 @@
       ],
       archivedHeaders: [
         { text: 'Transaction No.', value: 'transaction_number' },
+        { text: 'Rental Status', value: 'status' },
         { text: 'Rentee', value: 'user.info.last_name' },
         { text: 'Car', value: 'car.brand.brand' },
         { text: 'Pick Up Date', value: 'rental_info.pickup_date' },
         { text: 'Return Date', value: 'rental_info.pickup_date' },
         { text: 'Transaction Date', value: 'created_at' },
         { text: 'Additional Instruction', value: 'rental_info.additional_instruction' },
-        { text: 'Payment Type', value: 'rental_info.payment_status' },
+        { text: 'Payment Type', value: 'rental_info.payment_type' },
         { text: 'Total Payment', value: 'total_payment' },
         { text: 'Payment Status', value: 'rental_info.payment_status' },
         { text: 'Invoice', value: 'invoice' },
@@ -279,6 +297,18 @@
       this.isLoading = false;
     },
     methods: {
+      getChipColor(data) {
+        switch (data) {
+          case 'Pending':
+            return 'red';
+          case 'Cancelled':
+            return 'grey';
+          case 'On-going':
+            return 'green';
+          default:
+            return 'primary';
+        }
+      },
       showProfile(url) {
         this.$viewerApi({
           images: [`http://127.0.0.1:8000/images/${url}`],
@@ -335,6 +365,14 @@
       async getArchivedRentals() {
         await this.$store.dispatch('rentals/getArchivedRentals');
       },
+      async finishedRental() {
+        this.isLoading = true;
+        const { status, data } = await this.$store.dispatch('rentals/finishedRental', this.deleteData);
+        this.toastData(status, data);
+        this.finishedDialog = false;
+        this.deleteData = null;
+        this.isLoading = false;
+      },
       async archiveRental() {
         this.isLoading = true;
         const { status, data } = await this.$store.dispatch('rentals/archiveRental', this.deleteData);
@@ -359,8 +397,7 @@
           this.toastData(status, data);
           this.inputDialog = false;
           this.isLoading = false;
-        this.getRentals()
-
+          this.getRentals();
         }
       },
       async deleteRental() {

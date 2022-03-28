@@ -26,7 +26,7 @@ class DashboardController extends Controller
             $cars = Car::count();
             $users = User::count();
             $rents = Rental::whereRelation('car', 'rental_status', '<>', 'Available')->count();
-            $rentals = Rental::with(['car:id,car_brand_id,model,plate_number,year,seats,vehicle_identification_number', 'car.brand:id,brand,logo', 'rental_info', 'user.info', 'payment'])->latest()->take(5)->get();
+            $rentals = Rental::with(['car:id,rental_status,car_brand_id,model,plate_number,year,seats,vehicle_identification_number', 'car.brand:id,brand,logo', 'rental_info', 'user.info', 'payment'])->latest()->take(5)->get();
             return response()->json([
                 'cars' => $cars,
                 'brand' => $brand,

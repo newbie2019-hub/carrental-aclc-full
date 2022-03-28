@@ -167,7 +167,7 @@
     }),
     async mounted() {
       await this.$store.dispatch('home/getData');
-      this.branch.push({ branch: 'Show All', id: 0 });
+      // this.branch.push({ branch: 'Show All ', id: 0 });
     },
     methods: {
       showModal() {

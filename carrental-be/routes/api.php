@@ -68,6 +68,7 @@ Route::middleware('api')->group(function () {
     Route::apiResource('branch', BranchController::class);
 
     Route::apiResource('archived-rentals', ArchivedRentalController::class);
+    Route::put('rentals/finished/{id}', [RentalController::class, 'markFinished']);
     Route::apiResource('rentals', RentalController::class);
 
     Route::get('dashboard', [DashboardController::class, 'index']);

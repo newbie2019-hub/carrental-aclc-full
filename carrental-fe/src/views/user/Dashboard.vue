@@ -100,10 +100,23 @@
     <div class="mt-14">
       <p class="text-h5 font-weight-bold mt-4 custom-primary-color mb-0">Latest Transaction</p>
       <p>Shown below are the latest transactions for this day</p>
+      <v-card-title>
+        <v-spacer></v-spacer>
+        <v-spacer></v-spacer>
+        <v-spacer></v-spacer>
+        <v-spacer></v-spacer>
+        <v-text-field v-model="search" outlined dense append-icon="mdi-magnify" class="mb-5" label="Search" single-line hide-details></v-text-field>
+      </v-card-title>
       <v-data-table :headers="headers" :items="latest_transactions" :search="search" :loading="isLoading" :loading-text="'Retrieving rentals data. Please wait ...'">
         <template v-slot:item.invoice="{ item }">
           <a v-if="item.rental_info.payment_type == 'On Branch'" class="text-decoration-none" :href="`http://127.0.0.1:8000${item.invoice}`" target="_">View Invoice</a>
           <a v-else class="text-decoration-none" :href="`${item.invoice}`" target="_">View Invoice</a>
+        </template>
+        <template style="min-width: 250px !important" v-slot:header.rental_info.additional_instructions="{ header }">
+          <p >{{header}}</p>
+        </template>
+        <template v-slot:item.car.rental_status="{ item }">
+          <v-chip small dark :color="getChipColor(item.car.rental_status)">{{ item.car.rental_status }}</v-chip>
         </template>
         <template v-slot:item.user.info.last_name="{ item }">
           <p class="text-no-wrap">{{ item.user.info.last_name }}, {{ item.user.info.first_name }} {{ item.user.info.middle_name ? item.user.info.middle_name[0] : '' }}</p>
@@ -127,6 +140,7 @@
     data: () => ({
       headers: [
         { text: 'Transaction No.', value: 'transaction_number' },
+        { text: 'Rental Status', value: 'car.rental_status' },
         { text: 'Rentee', value: 'user.info.last_name' },
         { text: 'Car', value: 'car.brand.brand' },
         { text: 'Pick Up Date', value: 'rental_info.pickup_date' },
@@ -138,7 +152,7 @@
         { text: 'Total Payment', value: 'total_payment' },
         { text: 'Invoice', value: 'invoice' },
       ],
-      search: ''
+      search: '',
     }),
     async mounted() {
       this.isLoading = true;
@@ -146,7 +160,20 @@
       await this.$store.dispatch('dashboard/getData');
       this.isLoading = false;
     },
-    methods: {},
+    methods: {
+      getChipColor(data) {
+        switch (data) {
+          case 'Pending':
+            return 'red';
+          case 'Cancelled':
+            return 'grey';
+          case 'On-going':
+            return 'green';
+          default:
+            return 'primary';
+        }
+      },
+    },
     computed: {
       ...mapState('auth', ['user']),
       ...mapState('dashboard', ['cars', 'brands', 'branch', 'latest_transactions', 'users', 'inquiry', 'rentals']),

@@ -27,7 +27,7 @@ class CarController extends Controller
     public function approveCar($id){
         $car = Car::where('id', $id)->first();
         $car->update([
-            'for_rent_status' => 'Approve'
+            'for_rent_status' => 'Approved'
         ]);
 
         $car->load(['user', 'user.info', 'branch', 'brand', 'rate']);
@@ -62,7 +62,8 @@ class CarController extends Controller
             'user_id' => auth()->user()->id,
             'image' => $request->image,
             'car_rate_id' => $carrate->id,
-            'for_rent_status' => $status
+            'for_rent_status' => $status,
+            'rental_status' => 'Available'
         ]);
 
         $cars->load(['user', 'user.info', 'branch', 'brand', 'rate']);
@@ -103,6 +104,10 @@ class CarController extends Controller
     public function destroy($id){
         Car::destroy($id);
         $cars = Car::onlyTrashed()->where('id', $id)->first();
+        $cars->update([
+            'rental_status' => 'Not Available',
+            'for_rent_status' => 'Pending'
+        ]);
         $cars->load(['user', 'user.info', 'branch', 'brand', 'rate']);
         return $this->success('Car has been archived', $cars);
     }

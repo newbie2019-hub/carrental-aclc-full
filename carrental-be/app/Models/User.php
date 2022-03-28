@@ -73,5 +73,9 @@ class User extends Authenticatable implements JWTSubject
         return $this->belongsTo(UserInfo::class, 'user_info_id', 'id')->withTrashed();
     }
 
+    public function cars(){
+        return $this->hasMany(Car::class, 'user_id', 'id');
+    }
+
     
 }

@@ -58,6 +58,12 @@
               <v-img class="cursor-pointer" @click.prevent="showProfile(item.image)" v-if="item.image" :src="`http://127.0.0.1:8000/images/cars/${item.image}`" />
             </v-avatar>
           </template>
+          <template v-slot:item.user.info.last_name="{ item }">
+            <p class="text-no-wrap">{{item.user.info.last_name}}, {{item.user.info.first_name}}</p>
+          </template>
+          <template v-slot:item.rental_status="{ item }">
+            <v-chip small dark :color="getChipColor(item.rental_status)">{{ item.rental_status }}</v-chip>
+          </template>
           <template v-slot:item.for_rent_status="{ item }">
             <v-chip small dark :color="item.for_rent_status == 'Approved' ? 'green' : 'red'">{{ item.for_rent_status }}</v-chip>
           </template>
@@ -69,9 +75,7 @@
               @click.prevent="
                 carRates = item;
                 rateDialog = true;
-              "
-              >View</v-btn
-            >
+              ">View</v-btn>
           </template>
           <template v-slot:item.actions="{ item }">
             <v-layout>
@@ -97,7 +101,7 @@
                 >Update</v-btn
               >
               <v-btn
-              v-if="item.rental_status != 'On-going'"
+                v-if="item.rental_status != 'On-going'"
                 @click="
                   deleteData = item;
                   archiveDialog = true;
@@ -138,6 +142,9 @@
               "
               >View</v-btn
             >
+          </template>
+          <template v-slot:item.rental_status="{ item }">
+            <v-chip small dark :color="getChipColor(item.rental_status)">{{ item.rental_status }}</v-chip>
           </template>
           <template v-slot:item.for_rent_status="{ item }">
             <v-chip small dark :color="item.for_rent_status == 'Approved' ? 'green' : 'red'">{{ item.for_rent_status }}</v-chip>
@@ -233,7 +240,7 @@
             <v-row dense>
               <v-col cols="12" sm="6" md="6" lg="6">
                 <v-select
-                  :items="branch"
+                  :items="carBranch"
                   item-value="id"
                   item-text="branch"
                   outlined
@@ -534,6 +541,7 @@
       restoreData: {},
       isModalVisible: false,
       headers: [
+        { text: 'Owner', value: 'user.info.last_name'},
         { text: 'Image', value: 'image', sortable: false },
         { text: 'Rent Status', value: 'rental_status', sortable: true },
         {
@@ -594,6 +602,16 @@
       this.isLoading = false;
     },
     methods: {
+      getChipColor(data) {
+        switch (data) {
+          case 'Pending':
+            return 'red';
+          case 'On-going':
+            return 'green';
+          default:
+            return 'primary';
+        }
+      },
       async approveCar() {
         this.isLoading = true;
         const { status, data } = await this.$store.dispatch('cars/approveCar', this.carData);
@@ -699,6 +717,9 @@
       ...mapState('cars', ['cars', 'archivedCars']),
       ...mapState('home', ['branch', 'brands']),
       ...mapState('auth', ['user']),
+      carBranch(){
+        return this.branch.filter((branch) => branch.branch != 'Show All Branch')
+      }
     },
     watch: {
       inputDialog() {
